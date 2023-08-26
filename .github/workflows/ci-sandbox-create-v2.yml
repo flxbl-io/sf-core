@@ -4,7 +4,7 @@ name: 'Job - CI Sandbox - Creator'
 on:
   workflow_dispatch:
   schedule:
-      - cron: '0 */4 * * *'   
+      - cron: '0 */6 * * *'   
 
 #Set the environment variables for tracking metrics
 env:

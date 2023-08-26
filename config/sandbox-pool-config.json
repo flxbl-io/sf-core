@@ -1,0 +1,12 @@
+[
+  {
+    "domain": "CORE",
+    "count": 2,
+    "sourceSB": "MASTERDEV"
+  },
+  {
+    "domain": "HOTFIX",
+    "count": 1,
+    "sourceSB": "production"
+  },
+]
