@@ -9,7 +9,7 @@ body:
       label: Pick a source sandbox to refresh from
       description: goldenSB for regular development, production for  hotfixes
       options:
-         - goldenSB
+         - MASTERDEV
          - production
     validations:
      required: true
