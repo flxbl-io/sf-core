@@ -1,0 +1,24 @@
+name: UnFreeze users from an environment(s)
+description: This issue allows you to unfreeze all frozen users from an environment
+title: "Ops - UnFreeze Users from environments"
+labels: ["ops","ops-unfreeze-users"]
+body:
+  - type: input
+    id: profiles
+    attributes:
+      label: Only unfreeze a particular profile?
+      description: By default, all frozen users will be unfrozen, If you need to unfreeze only a particular profile, please list these profiles seperated by commas
+    validations:
+      required: false
+  - type: checkboxes
+    id: envs
+    attributes:
+      label: Pick environments where users should be frozen
+      description: The environment name should match the environments configured in github actions
+      options:
+         - label: QA
+         - label: SIT
+         - label: MASTERDEV
+         - label: STAGING
+         - label: PROD
+ 

@@ -1,0 +1,23 @@
+name: Freeze users from an environment(s)
+description: This issue allows you to freeze all users in an environment
+title: "Ops - Freeze Users from environments"
+labels: ["ops","ops-freeze-users"]
+body:
+  - type: input
+    id: profiles
+    attributes:
+      label: Are there any additional profiles that need to be frozen other than System Administrator?
+      description: By default, all profiles will be locked out except System Adminstrator, If you need additional users to be excluded, please list their profiles seperated by commas
+    validations:
+      required: false
+  - type: checkboxes
+    id: envs
+    attributes:
+      label: Pick environments where users should be frozen
+      description: The environment name should match the environments configured in github actions
+      options:
+         - label: QA
+         - label: SIT
+         - label: MASTERDEV
+         - label: STAGING
+         - label: PROD

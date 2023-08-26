@@ -1,0 +1,38 @@
+name: Request a release into a non pipeline linked org
+description: This issue allows you to request a release of a domain into an org created by 'buildbot'
+title: "Ops - Request a release into an org"
+labels: ["ops","ops-release-request-non-pipeline-env"]
+body:
+  - type: input
+    id: domain
+    attributes:
+      label: Provide the domain
+      description: Pick the domain you want it to be released
+  - type: input
+    id: releasedefn
+    attributes:
+      label: Provide the release definition
+      description: You can visit the  sfops  dashboard and pick the release number that you want to be deployed to the org
+    validations:
+      required: true
+  - type: input
+    id: orgname
+    attributes:
+      label:  Name of the org
+      description: Please provide the name of the org, Only orgs created by build bot can be used, If you want to create a new org, please raise an issue first
+    validations:
+      required: true
+  - type: input
+    id: envprofile  
+    attributes:
+      label: Environment Profile
+      description: Environment profiles define the type of metadata for aliasifed packages, Select an env orgs as mentioned in sfdx-project.json , For example ci, qa, uat, prod
+    validations:
+      required: true
+  - type: checkboxes
+    id: forceInstall
+    attributes:
+       label: Do you want to force install all the  package in release defn?
+       description: Please select this option if you want to deploy all the packages even if its already installed in the org, Please note it will take considerable time depending on the number of packages in the domain
+       options:
+       - label: 'yes'

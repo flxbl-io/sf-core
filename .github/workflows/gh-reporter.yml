@@ -1,0 +1,44 @@
+name: 'Job - Report Github metrics'
+
+# Read name of sandbox
+on:
+  workflow_dispatch:
+  schedule:
+      - cron: '0 12 * * *' # At 12 00 UTC every day
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+jobs:
+ 
+  report:
+    name: 'Report github metrics'
+    runs-on: ubuntu-latest
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    steps:
+      - uses: actions/checkout@v3
+
+
+      - name: 'Initialize and Setup' 
+        run: |
+              npm install
+              # Setup safe directory as github actions checkout errors out in containers with root user
+              git config --global --add safe.directory /__w/sf-core/sf-core
+
+              # Install ubuntu
+              type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+              curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+              && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+              && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+              && sudo apt update \
+              && sudo apt install gh -y
+
+
+      - name: 'Run github metric reporter'  
+        run: |
+          node scripts/build-scripts/github-pr-status-reporter.js $(date "+%Y-%m-%d")
+        env:
+          GH_TOKEN: ${{ secrets.GHA_TOKEN }}

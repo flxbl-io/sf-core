@@ -1,0 +1,80 @@
+name: IssueOps - Delete Dev Sandboxes on Expiry
+on:
+  schedule:
+    - cron: '0 12 * * *' # At 12 00 UTC every day
+  workflow_dispatch:
+
+
+jobs:
+  close_sbx-create_issues:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Close Sandbox Creation Requests if expired
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GHA_TOKEN }}
+        script: |
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: "ops-sandbox-request",
+          });
+
+          const now = new Date();
+          for (const issue of issues.data) {
+            const issueCreatedAt = new Date(issue.created_at);
+            const daysOld = Math.ceil((now - issueCreatedAt) / (1000 * 60 * 60 * 24));
+
+            // Here we parse the issue body to get the DAYS_TO_KEEP value
+            const lines = issue.body.split("\n");
+            const questionIndex = lines.findIndex(line => line.includes("How long should the sandbox be kept?"));
+            if (questionIndex !== -1 && lines.length > questionIndex + 2) {
+            let DAYS_TO_KEEP = 10;
+              try
+              {
+                DAYS_TO_KEEP = parseInt(lines[questionIndex + 2].trim());
+                if(DAYS_TO_KEEP < 1)
+                  DAYS_TO_KEEP = 1;
+              }
+              catch(error)
+              {
+                DAYS_TO_KEEP=10;
+              }
+              console.log(`Days to keep: ${DAYS_TO_KEEP}... daysOld: ${daysOld}... issue #${issue.number}`);
+              if (daysOld > DAYS_TO_KEEP) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed'
+                });
+                console.log(`Closed issue #${issue.number}`);
+              }
+            }
+          }
+
+
+    - name: Redo close Sandbox Creation Requests if it failed previously
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GHA_TOKEN }}
+        script: |
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: "ops-sandbox-request-delete-failed",
+              });
+    
+              for (const issue of issues.data) {
+                    await github.rest.issues.update({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      state: 'closed'
+                    });
+                    console.log(`Closed issue #${issue.number}`);
+                }
+            
+             

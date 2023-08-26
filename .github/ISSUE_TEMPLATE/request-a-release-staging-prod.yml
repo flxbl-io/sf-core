@@ -1,0 +1,36 @@
+name: Request a release into staging/prod
+description: This issue allows you to request a release of a domain into Staging and Production, Please note these environments need approvals and is connected from a pipeline perspective'
+title: "Ops - Release a domain into staging/prod"
+labels: ["ops","ops-release-request"]
+body:
+  - type: input
+    id: domain
+    attributes:
+      label: Provide the domain
+      description: Pick the domain you want it to be released
+  - type: input
+    id: releasedefn
+    attributes:
+      label: Provide the release definition
+      description: You can visit the  sfops  dashboard and pick the release number that you want to be deployed to the org
+    validations:
+      required: true
+  - type: input
+    id: overridePackageVersions
+    attributes:
+       label: Do you want to override any version of a package in the release defn?
+       description: Please enter the name of the package and the new version you want (<package_name>:<version> ), If you have multiple packages please seperate it by commas , Please note this will override the version in the release defn
+  - type: input
+    id: excludePackages
+    attributes:
+       label: Exclude any package from the release?
+       description: Please enter the name of the package you want to exclude from the release, If you have multiple packages please seperate it by commas
+  - type: checkboxes
+    id: forceInstall
+    attributes:
+       label: Do you want to force install all the  package in release defn?
+       description: Please select this option if you want to deploy all the packages even if its already installed in the org, Please note it will take considerable time depending on the number of packages in the domain
+       options:
+       - label: 'yes'
+
+

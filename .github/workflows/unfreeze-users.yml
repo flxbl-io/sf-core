@@ -1,0 +1,126 @@
+name: 'IssueOps - UnFreeze Users'
+run-name: 'UnFreeze Users-${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+on:
+  issues:
+    types: [ opened, reopened ]
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+  issue-analyzer:
+    if: contains(github.event.issue.title, 'Ops - UnFreeze Users from environments')
+    runs-on: ubuntu-latest
+    outputs:
+      parsedEnvs: ${{ steps.issue-analyzer-output.outputs.parsedEnvs }}
+      profiles: ${{ steps.issue-analyzer-output.outputs.profiles }}
+      targetorg: ${{ steps.issue-analyzer-output.outputs.targetorg }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/request-unfreeze-users.yml
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GHA_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [ "ops", "ops-unfreeze-users"]
+            })
+
+      - name: Create Comment before initiating action
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Your request has been received and is being processed. 
+            We will attempt to unfreeze all users in provided for ${{ steps.issue-parser.outputs.issueparser_profiles}} 
+            and will update this issue with the results.
+
+            If no profiles are provided, all users who are previously frozen will be unfrozen
+
+            You can follow the action at this link: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+
+      - name: Set Output
+        id: issue-analyzer-output
+        run: |
+            echo "profiles= ${{ steps.issue-parser.outputs.issueparser_profiles }}" >> "$GITHUB_OUTPUT"
+            echo "targetorg= ${{ steps.issue-parser.outputs.issueparser_targetorg }}" >> "$GITHUB_OUTPUT"
+
+            IFS=',' read -r -a array <<< "${{ steps.issue-parser.outputs.issueparser_envs }}"
+            output="["
+            for element in "${array[@]}"
+            do
+             output+="\"$element\","
+            done
+            output="${output::-1}"
+            output+="]"
+            echo "parsedEnvs=$output" >> "$GITHUB_OUTPUT"
+          
+           
+
+
+  execute_action:
+    needs: issue-analyzer
+    uses:  flxbl-io/sfops-gh-actions/.github/workflows/unfreeze-users-in-an-env.yml@main
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{  fromJson(needs.issue-analyzer.outputs.parsedEnvs) }}
+    with:
+       environment:  ${{ matrix.environment }}
+       profiles: ${{ needs.issue-analyzer.outputs.profiles }}
+    secrets:
+       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}  
+      
+
+
+      
+  close_issue:
+     runs-on: ubuntu-latest
+     needs:  execute_action
+     steps:
+
+      # gh needs a repo bummer
+      - uses: actions/checkout@v3
+
+      - name: Close Issue
+        run: |
+         gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: \n Your request has been sucessfully processed" -r "Completed"
+        env:
+           GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+
+  comment_issue_on_error:
+      runs-on: ubuntu-latest
+      needs:   execute_action
+      if: always() && needs.execute_action.result == 'failure'
+      steps:
+
+      - name: Create Comment after failure
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Apologies, it seems we ran into an issue, This would need your manual attention please check the job run
+            at the link https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

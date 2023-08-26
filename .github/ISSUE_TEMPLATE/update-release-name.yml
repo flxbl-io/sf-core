@@ -1,0 +1,13 @@
+name: Update a release name
+description: This issue allows you update the prefix name used by release definitions, Use it after the current sprint is closed
+title: "Ops - Update release name"
+labels: ["ops","ops-new-sprint-request"]
+body:
+  - type: input
+    id: releasename
+    attributes:
+      label: Provide the name of the release for this sprint
+      description: Each release definiton created starts with this release name, For example, if you provide 'Sprint-1', the release definition will be 'Sprint-1-<<dd-mm-yyyy-github-buildnumber>>'
+    validations:
+      required: true
+ 

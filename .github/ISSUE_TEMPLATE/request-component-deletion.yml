@@ -1,0 +1,24 @@
+name: Deletion of components from Org
+description: This issue allows you to test the deletion of components from higher envs in the pipeline
+title: "Ops - Deletion of a components from Org"
+labels: ["ops","ops-deletion-of-component"]
+body:
+  - type: input
+    id: components
+    attributes:
+      label: Provide the components that need to be deleted from the org
+      description: 'Only components that are NOT part of any unlocked packages can be deleted (such as unpackaged or source packages), provide the components in the format metadatatype:componentName, metadatatype:componentName'
+    validations:
+      required: true
+  - type: checkboxes
+    id: envs
+    attributes:
+      label: Pick environments where the component should be deleted from
+      description: The environment name should match the environments configured in github actions
+      options:
+         - label: QA
+         - label: SIT
+         - label: MASTERDEV
+         - label: STAGING
+         - label: PROD
+ 

@@ -1,0 +1,36 @@
+name: IssueOps - Cancel Pending Actions
+
+on:
+  issues:
+    types: [ closed ]
+
+
+
+run-name: Close any actions -${{ github.event.issue.number }}
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Find Comment with Run Info
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body-includes: "action at this link:"
+          direction: last
+          token: ${{ secrets.GHA_TOKEN }}
+
+      - name: 'Cancel any actions running or waiting on the comment'	
+        uses: flxbl-io/sfops-gh-actions/cancelActionsOnComments@main
+        with:
+         issue-number: ${{ github.event.issue.number }}
+         repo: flxbl-io/sf-core
+         gh_token: ${{ secrets.GHA_TOKEN }}

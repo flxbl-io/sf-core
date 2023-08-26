@@ -1,0 +1,31 @@
+name: Request a new developer sandbox
+description: This issue allows a developer to request a new developer sandbox for a defined duration
+title: "Ops - Request a new Dev Sandbox"
+labels: ["ops"]
+body:
+  - type: dropdown
+    id: sourceSB
+    attributes:
+      label: Pick a source sandbox to refresh from
+      description: goldenSB for regular development, production for  hotfixes
+      options:
+         - goldenSB
+         - production
+    validations:
+     required: true
+  - type: input
+    id: daysToKeep
+    attributes:
+      label: How long should the sandbox be kept?
+      description: Please provide the number of days to keep the sandbox, After which the sandbox will be deleted, Any value more than 15 will be defaulted to 15 days
+      placeholder: "10"
+    validations:
+      required: true
+  - type: input
+    id: email
+    attributes:
+      label:  Email of the user to which this sandbox should be assigned
+      description: Please provide an email id for the user to which this sandbox should be assigned, A random user with System Adminstrator profile will be created  and assigned this email
+    validations:
+      required: true
+

@@ -1,0 +1,180 @@
+name: 'PR - Validate'
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+  workflow_dispatch:
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+
+
+jobs:
+ 
+
+#  commit-lint:
+#     runs-on: ubuntu-latest
+
+#     steps:
+
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+
+#       - name: Setup Node
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 16
+#           cache: 'npm'
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Validate all commits from PR
+#         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+#       - name: Display in Job Summary
+#         if:  ${{ failure() }}
+#         run: |
+#             npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose > commitlint.md
+#             cat commitlint.md >> $GITHUB_STEP_SUMMARY
+#             gh pr comment ${{ github.event.pull_request.number }} --body-file commitlint.md
+#         env:
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+ static:
+    name: 'static-analysis-of-Apex-classes-using-PMD'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          
+      - uses: pmd/pmd-github-action@v1
+        with:
+          rulesets: 'pmd-rulesets/pmd-ruleset.xml'
+          analyzeModifiedFilesOnly: true
+          token: ${{ secrets.GHA_TOKEN }}
+ 
+ analyze:
+  name: 'Analyze Impacted Domains'
+  runs-on: ubuntu-latest
+  outputs:
+    matrix: ${{ steps.set-matrix.outputs.matrix }}
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: 'Figure Impacted Release Defns'
+      uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
+      with:
+       pathToReleaseDefns: 'config'
+       from-commit: ${{ github.event.pull_request.base.sha }}
+       to-commit: ${{ github.event.pull_request.head.sha }}   
+       
+    - name: Set matrix data
+      id: set-matrix
+      run: |
+         echo "matrix=$(jq -c . < ./impacted-releases.json)" >> $GITHUB_OUTPUT
+
+ validate:
+    name: 'Validate Changed Packages'
+    runs-on: ubuntu-latest
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    needs: analyze
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'Authenticate DevHub'
+        run: |
+            echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
+            sfdx auth:sfdxurl:store -f authfile -a devhub
+  
+      # Fetch a sandbox
+      - name: 'Fetch CI Sandboxes'
+        uses:  flxbl-io/sfops-gh-actions/fetchCISandbox@main
+        id: fetchCISandbox
+        with:
+          domain: ${{ matrix.domainNameUsedForPools }}
+          gh_token: ${{ secrets.GHA_TOKEN }}
+
+
+      - name: 'Authenticate ci'
+        run: |
+           sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
+           sfdx alias set ci=buildbot@orde.com.au.${{ steps.fetchCISandbox.outputs.sbxname }}
+
+      - name: 'Set Email Deliverability to All Email'
+        run: |
+             bash scripts/envSettings.sh ci
+
+      # Validate source and trigger test
+      - name: 'Validate Against ci'
+        run: |
+         echo 'y' | sfdx plugins:install skuid-sfdx
+          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+
+
+      - name: Create Message Body as File
+        id: message_template
+        run: |
+          echo "Hello  @${{ github.event.pull_request.user.login }}, " > message.md
+          if [ -f  .sfpowerscripts/outputs/org-info.md ]; then
+            cat .sfpowerscripts/outputs/org-info.md >> message.md
+          fi
+          if [ -f .sfpowerscripts/outputs/deployment-breakdown.md ]; then
+            cat .sfpowerscripts/outputs/deployment-breakdown.md >> message.md
+          else
+           echo "No changes detected for validation in ${{matrix.filePath}}" >> message.md
+          fi
+          if [ -f .sfpowerscripts/outputs/build-error-info.md ]; then
+            cat .sfpowerscripts/outputs/build-error-info.md >> message.md
+          fi
+
+      - uses: mshick/add-pr-comment@v2
+        name: Print Validation Breakdown
+        with:
+          allow-repeats: true
+          repo-token: ${{ secrets.GHA_TOKEN}}
+          message-path: |
+             message.md 
+            
+      # Publish logs
+      - uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: .sfpowerscripts/logs
+
+      # Fetch a sandbox
+      - name: 'Release CI Sandboxes'
+        uses:  flxbl-io/sfops-gh-actions/releaseCISandbox@main
+        if: always()
+        with:
+          domain: ${{ matrix.domainNameUsedForPools }}
+          sbxname: ${{ steps.fetchCISandbox.outputs.sbxname }}
+          gh_token: ${{ secrets.GHA_TOKEN }}
+
+
+ results:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name:  Status Check - Validate Domain
+    needs: [validate]
+    steps:
+      - run: exit 1
+        if: ${{  contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

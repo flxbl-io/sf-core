@@ -1,0 +1,20 @@
+name: Test Deletion of components from Org
+description: This issue allows you to test the deletion of components from a developer/test sandboxes created by buildbot
+title: "Ops - Test Deletion of a components"
+labels: ["ops","ops-test-deletion-of-component"]
+body:
+  - type: input
+    id: components
+    attributes:
+      label: Provide the components that need to be deleted from the org
+      description: 'Only components that are NOT part of any unlocked packages can be deleted (such as unpackaged or source packages), provide the components in the format metadatatype:componentName, metadatatype:componentName'
+    validations:
+      required: true
+  - type: input
+    id: targetorg
+    attributes:
+      label: Name of the target org
+      description: 'Provide the name of the target org where the components need to be deleted from'
+    validations:
+      required: true
+ 

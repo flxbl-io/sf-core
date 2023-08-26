@@ -1,0 +1,220 @@
+# build all packages
+
+
+name: 'Build-main'
+
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+  analyze:
+    name: 'Analyze Impacted Domains'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+  
+      - name: Figure out the last tagged commit id
+        id: commit-finder
+        run: |
+          echo "last_tagged_commit=$(git rev-parse $(git describe --tags --match '*_v*' --abbrev=0))" >> $GITHUB_OUTPUT
+
+      - name: 'Figure Impacted Release Defns'
+        uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
+        with:
+         pathToReleaseDefns: 'config'
+         from-commit: ${{ steps.commit-finder.outputs.last_tagged_commit }}
+         to-commit: HEAD
+         
+      - name: Set matrix data
+        id: set-matrix
+        run: |
+           echo "matrix=$(jq -c . < ./impacted-releases.json)" >> $GITHUB_OUTPUT
+  
+  build:
+    name: 'Build packages'
+    runs-on: ubuntu-latest
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    needs: analyze
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'Authenticate Dev Hub'
+        run: |
+          echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
+          sfdx auth:sfdxurl:store -f authfile -a devhub
+
+      - name: 'Create packages'
+        id: sfpowerscripts-build
+        run: |
+          sfpowerscripts orchestrator:build -v devhub --diffcheck --branch main --buildnumber ${GITHUB_RUN_ID} --releaseconfig=${{matrix.filePath}}
+
+      # Publish artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts-${{ matrix.releaseName}}
+          path: artifacts
+          if-no-files-found: ignore
+
+      # Publish logs
+      - uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: .sfpowerscripts/logs
+
+  consolidateartifacts:
+    name: 'Consolidate build artifacts'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v3
+        with:
+             path:  matrix-build-artifacts
+
+      - name: 'Copy over artifacts'
+        run: |
+          rsync -av matrix-build-artifacts/build-artifacts-* artifacts/
+
+      # Publish artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts
+  
+  deploy:
+     needs: 
+       - consolidateartifacts
+     uses:   flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
+     with:
+       environment: 'QA'
+       environment-profile: 'qa'
+     secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      gh-token: ${{ secrets.GHA_TOKEN }}
+      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
+      datadog-host: ${{ secrets.DATADOG_HOST }}
+
+  deploySIT:
+     needs: 
+       - consolidateartifacts
+     uses:  flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
+     with:
+       environment: 'SIT'
+       environment-profile: 'sit'
+     secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      gh-token: ${{ secrets.GHA_TOKEN }}
+      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
+      datadog-host: ${{ secrets.DATADOG_HOST }}
+
+  deployMASTERDEV:
+     needs: 
+       - consolidateartifacts
+     uses:   flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
+     with:
+       environment: 'MASTERDEV'
+       environment-profile: 'qa'
+     secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      gh-token: ${{ secrets.GHA_TOKEN }}
+      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
+      datadog-host: ${{ secrets.DATADOG_HOST }}
+
+   
+  
+  publish:
+    name: 'publish'
+    runs-on: ubuntu-latest
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    needs: 
+      - deployMASTERDEV
+      - deploySIT
+      - analyze
+      - build
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+
+      - uses: actions/download-artifact@v3
+        with:
+            name: build-artifacts-${{ matrix.releaseName }}
+            path: artifacts 
+  
+
+      # Authenticate to npm
+      - uses: actions/setup-node@v3
+        with:
+         registry-url: 'https://npm.pkg.github.com'
+
+      - name: Publish
+        run: |
+          sfpowerscripts orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
+        env:
+         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
+         
+
+
+      - name: Generate release notes
+        if: always()
+        run: |
+           sfpowerscripts releasedefinition:generate -b releasedefns  -c  HEAD  -d ${{matrix.releaseName}} -f  ${{matrix.filePath}} -n $RELEASE_NAME
+           sfpowerscripts changelog:generate -b releasedefns  -d artifacts -w "(ABC)" -r "https://flxbl.atlassian.net" -n $RELEASE_NAME --directory ${{matrix.releaseName}}  
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
+
+  
+      - name: 'Report changelog'
+        uses: flxbl-io/sfops-gh-actions/changelogReporter@main  
+        with:
+         source-branch: releasedefns
+         target-dir: changelog
+         pathToReleaseConfigs: config
+         target-repo: flxbl-io/sfops-dashboard
+         gh_token: ${{ secrets.GHA_TOKEN }}
+         source-repo-url: https://github.com/flxbl-io/sf-core
+         workitem-url: https://flxbl.atlassian.net
+
+      - uses: mshick/add-pr-comment@v2
+        with:
+         allow-repeats : true
+         message: |
+          This work item  is now published in the following release defn  ${{env.RELEASE_NAME}} .
+          The link is available at https://flxbl-io.github.io/sfops-dashboard/changelog/changelog-${{matrix.releaseName}}.html#${{env.RELEASE_NAME}}
+
+ 

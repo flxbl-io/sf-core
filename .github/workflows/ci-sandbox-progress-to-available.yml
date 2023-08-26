@@ -1,0 +1,53 @@
+name: 'Job - CI Sandbox - Allocate to Pool'
+
+# Read name of sandbox
+on:
+  workflow_dispatch:
+  schedule:
+      - cron: '30 * * * *'   
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+jobs:
+  check-ci-sandbox-status:
+    runs-on: ubuntu-latest
+    continue-on-error: true 
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+            node-version: "18" 
+
+
+      - name: Check time and exit if not within time range
+        run: |
+          # Get current hour in AEST
+          HOUR=$(TZ=":Australia/Melbourne" date +"%H")
+          if (( HOUR < 8 || HOUR > 23 )); then
+            echo "Outside of 8 AM - 11 PM AEST, exiting"
+            exit 1
+          fi
+
+      - name: 'Authenticate DevHub'
+        run: |
+              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
+              sfdx auth:sfdxurl:store -f authfile -a devhub
+
+      #Create a sandbox
+      - name: 'Provision sandboxes to Available'
+        uses:  flxbl-io/sfops-gh-actions/checkCISandboxStatus@main
+        with:
+          devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+          usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
+          gh_token: ${{ secrets.GHA_TOKEN }}
+          pathToPoolConfigFile: "config/sandbox-pool-config.json"
+
+
+

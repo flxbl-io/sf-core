@@ -1,0 +1,108 @@
+name: 'IssueOps - Update release name'
+run-name: 'Update Release name -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+on:
+  issues:
+    types: [ opened ]
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+  issue-analyzer:
+    if: contains(github.event.issue.title, 'Ops - Update release name')
+    runs-on: ubuntu-latest
+    outputs:
+      releaseName: ${{ steps.issue-analyzer-output.outputs.releasename }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/update-release-name.yml      
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GHA_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [ "ops", "ops-update-release-name"]
+            })
+
+      - name: Create Comment before initiating action
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Your request has been received and is being processed. The release names will be updated in a moment
+            All release definitions from this point will have the new release names prefixed from this stage
+
+      - name: Set Output
+        id: issue-analyzer-output
+        run: |
+            cleaned_release_name=$(echo  "${{ steps.issue-parser.outputs.issueparser_releasename }}" | tr '[:blank:]' '_' | tr -dc '[:alnum:]_.\\-')
+            echo "releaseName=$cleaned_release_name" >> "$GITHUB_OUTPUT"
+          
+           
+
+  execute_action:
+    runs-on: ubuntu-latest
+    needs: issue-analyzer
+    if: contains(github.event.issue.title, 'Ops - Update release name')
+    steps:
+
+     # gh needs a repo bummer
+     - uses: actions/checkout@v3
+
+     - name: Update Release Name
+       run: |
+         gh variable set RELEASENAME  --body  ${{ needs.issue-analyzer.outputs.releaseName }}  
+       env:
+          GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+
+      
+  close_issue:
+     runs-on: ubuntu-latest
+     needs:  execute_action
+     if: contains(github.event.issue.title, 'Ops - Update release name')
+     steps:
+
+      # gh needs a repo bummer
+      - uses: actions/checkout@v3
+
+      - name: Close Issue
+        run: |
+         gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: \n Your request has been sucessfully processed" -r "Completed"
+        env:
+           GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+
+  comment_issue_on_error:
+      runs-on: ubuntu-latest
+      needs:   execute_action
+      if: always() && needs.execute_action.result == 'failure'
+      steps:
+
+      - name: Create Comment after failure
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Apologies, it seems we ran into an issue, This would need your manual attention please check the job run
+            at the link https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

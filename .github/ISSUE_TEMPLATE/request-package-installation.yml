@@ -1,0 +1,35 @@
+name: Request a 2GP package installation
+description: This issue allows you to request a new managed/unlocked package installation to a target org
+title: "Ops - Install a new managed/unlocked package"
+labels: ["ops","ops-package-installation-request"]
+body:
+  - type: checkboxes
+    id: envs
+    attributes:
+      label: Pick an environment where the package should be installed to
+      description: The environment name should match the environments configured in github actions
+      options:
+         - label: QA
+         - label: SIT
+         - label: MASTERDEV
+         - label: STAGING
+         - label: PROD
+  - type: input
+    id: packageId
+    attributes:
+      label: Subscriber Package ID of the package?
+      description: Please provide the subscriber package id of the package to be installed, It starts with 04t
+    validations:
+      required: true
+  - type: input
+    id: key
+    attributes:
+      label:  Installation Key if any?
+      description: Please provide installation key if any, otherwise leave it blank
+  - type: checkboxes
+    id: forceInstall
+    attributes:
+       label: Do you want to force install the package?
+       description: If you want to force install the package, please select yes
+       options:
+       - label: 'yes'
