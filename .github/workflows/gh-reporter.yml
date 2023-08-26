@@ -24,7 +24,6 @@ jobs:
 
       - name: 'Initialize and Setup' 
         run: |
-              npm install
               # Setup safe directory as github actions checkout errors out in containers with root user
               git config --global --add safe.directory /__w/sf-core/sf-core
 
