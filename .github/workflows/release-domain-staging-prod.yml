@@ -108,8 +108,6 @@ jobs:
         branchname: releasedefns
         additional-plugins: 'skuid-sfdx'
         overrideSkipIfAlreadyInstalled: ${{ needs.issue-analyzer.outputs.forceInstall}}
-        all-envs: 'qa,uat,goldensb,staging,prod'
-        all-domains: 'orde-cl,orde-sales,orde-loan-servicing,orde-org-support,orde-hotfix'
         source-repo-url: https://github.com/flxbl-io/sf-core
         target-repo: flxbl-io/sfops-dashboard
         workitem-url: https://flxbl.atlassian.net
