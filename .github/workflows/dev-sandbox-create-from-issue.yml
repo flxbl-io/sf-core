@@ -97,9 +97,7 @@ jobs:
            email: ${{ needs.issue-analyzer.outputs.email }}
            devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
            sourceSB: ${{ needs.issue-analyzer.outputs.sourceSB }}
-           usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
            daysToKeep: ${{ needs.issue-analyzer.outputs.daysToKeep }}
-           apexClassId: "01p8w0000009975AAA"
 
         - name: Create comment after successfull creation of sandbox
           uses: peter-evans/create-or-update-comment@v3
