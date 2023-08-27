@@ -119,10 +119,6 @@ jobs:
            sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
            sfdx alias set ci=buildbot@orde.com.au.${{ steps.fetchCISandbox.outputs.sbxname }}
 
-      - name: 'Set Email Deliverability to All Email'
-        run: |
-             bash scripts/envSettings.sh ci
-
       # Validate source and trigger test
       - name: 'Validate Against ci'
         run: |
