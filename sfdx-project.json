@@ -1,9 +1,14 @@
 {
   "packageDirectories": [
     {
+      "path": "src/frameworks/feature-management",
+      "name": "feature-management",
+      "version": "1.0.0.NEXT"
+    },
+    {
       "path": "unpackaged",
       "name": "unpackaged",
-      "version":"1.0.0.NEXT",
+      "version": "1.0.0.NEXT",
       "packageType": "diff",
       "default": true
     }
