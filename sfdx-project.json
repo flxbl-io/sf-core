@@ -1,0 +1,15 @@
+{
+  "packageDirectories": [
+    {
+      "path": "unpackaged",
+      "name": "unpackaged",
+      "version":"1.0.0.NEXT",
+      "packageType": "diff",
+      "default": true
+    }
+  ],
+  "name": "sf-core",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "58.0"
+}
