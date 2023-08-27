@@ -13,85 +13,52 @@ env:
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
 jobs:
-  testInQA:
-    name: 'Test in QA'
+
+  fetch-all-envs:
     runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
-    environment:
-      name: qa
+    outputs:
+      allEnvsAsJSON: ${{ steps.fetchAllEnvs.outputs.allEnvsAsJSON }}
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Authenticate to qa
+      - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
+        id: fetchAllEnvs
+        with:
+          gh_token: ${{ secrets.GHA_TOKEN }}
+          filter: "testrun:true"
+  
+
+  test:
+    name: 'Test in  ${{matrix.environment}}'
+    runs-on: ubuntu-latest
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Authenticate to ${{matrix.environment}}
         id: handle-auth
         uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
         with: 
           DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          org-name: qa
-          environment-profile: qa
+          org-name: ${{matrix.environment}}
+          environment-profile: ${{matrix.environment}}
       
       - name: 'Run all local apex tests and report results'
         uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
         with:
-         alias: qa
+         alias: ${{matrix.environment}}
          target-repo: flxbl-io/sfops-dashboard
          gh_token: ${{ secrets.GHA_TOKEN }}
   
-  testInSIT:
-    name: 'Test in SIT'
-    runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
-    environment:
-      name: SIT
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Authenticate to sit
-        id: handle-auth
-        uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
-        with: 
-          DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          org-name: sit
-          environment-profile: sit
-
-
-      - name: 'Run all local apex tests and report results'
-        uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
-        with:
-         alias: sit
-         target-repo: flxbl-io/sfops-dashboard
-         gh_token: ${{ secrets.GHA_TOKEN }}
-
-  testInProd:
-      name: 'Test in Prod'
-      runs-on: ubuntu-latest
-      container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
-      environment:
-        name: prod
-      steps:
-        - uses: actions/checkout@v3
-          with:
-            fetch-depth: 0
-
-        - name: Authenticate to ${{ inputs.environment }}
-          id: handle-auth
-          uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
-          with: 
-            DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-            org-name: prod
-
-        
-        - name: 'Run all local apex tests and report results'
-          uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
-          with:
-            alias: prod
-            target-repo: flxbl-io/sfops-dashboard
-            gh_token: ${{ secrets.GHA_TOKEN }}        
-         
+ 
   static:
     name: 'static-analysis-of-Apex-classes-using-PMD'
     runs-on: ubuntu-latest
