@@ -143,6 +143,7 @@ jobs:
      with:
        environment: ${{ matrix.environment }}
        environment-profile: 'qa'
+       org-name: ${{ matrix.environment }}
      secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
