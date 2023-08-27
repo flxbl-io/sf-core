@@ -24,10 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Authenticate to qa sandbox   
-        run: |
-          echo "${{ secrets.SB_SFDX_AUTH_URL }}" > ./sb_authfile
-          sfdx auth:sfdxurl:store -f ./sb_authfile -a qa
+      - name: Authenticate to ${{ inputs.environment }}
+        id: handle-auth
+        uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
+        with: 
+          DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+          org-name: qa
+          environment-profile: qa
       
       - name: 'Run all local apex tests and report results'
         uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
@@ -36,8 +39,8 @@ jobs:
          target-repo: flxbl-io/sfops-dashboard
          gh_token: ${{ secrets.GHA_TOKEN }}
   
-  testInUAT:
-    name: 'Test in UAT'
+  testInSIT:
+    name: 'Test in SIT'
     runs-on: ubuntu-latest
     container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
     environment:
@@ -47,15 +50,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Authenticate to qa sandbox   
-        run: |
-          echo "${{ secrets.SB_SFDX_AUTH_URL }}" > ./sb_authfile
-          sfdx auth:sfdxurl:store -f ./sb_authfile -a uat
-      
+      - name: Authenticate to ${{ inputs.environment }}
+        id: handle-auth
+        uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
+        with: 
+          DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+          org-name: sit
+          environment-profile: sit
+
+
       - name: 'Run all local apex tests and report results'
         uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
         with:
-         alias: uat
+         alias: sit
          target-repo: flxbl-io/sfops-dashboard
          gh_token: ${{ secrets.GHA_TOKEN }}
 
@@ -70,10 +77,13 @@ jobs:
           with:
             fetch-depth: 0
 
-        - name: 'Authenticate Prod'
-          run: |
-              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
-              sfdx auth:sfdxurl:store -f authfile -a prod
+        - name: Authenticate to ${{ inputs.environment }}
+          id: handle-auth
+          uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
+          with: 
+            DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+            org-name: prod
+
         
         - name: 'Run all local apex tests and report results'
           uses: flxbl-io/sfops-gh-actions/apextestresultReporter@main
