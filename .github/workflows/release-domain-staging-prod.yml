@@ -1,5 +1,5 @@
-name: 'IssueOps - Release a Domain To Staging/Prod'
-run-name: 'Release a domain To Staging/Prod-${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+name: 'IssueOps - Release a Domain To Release Envs'
+run-name: 'Release a domain To Release Envs -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
 on:
   issues:
     types: [ opened , reopened]
@@ -65,14 +65,29 @@ jobs:
 
             If this is a mistake, please close this issue, cancel the above action and raise a new issue with the correct details
 
-  
-  pre_release_check:
+  fetch-all-envs:
     needs: issue-analyzer
+    runs-on: ubuntu-latest
+    outputs:
+      allEnvsAsJSON: ${{ steps.fetchAllEnvs.outputs.allEnvsAsJSON }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
+        id: fetchAllEnvs
+        with:
+          gh_token: ${{ secrets.GHA_TOKEN }}
+          filter: "type:release"
+
+  pre_release_check:
+    needs: fetch-all-envs
     uses:  flxbl-io/sfops-gh-actions/.github/workflows/pre-release-check.yml@main
     strategy:
       fail-fast: false
       matrix:
-        environment: [ 'staging', 'prod']
+        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
     with:
         sbxname:  ${{ matrix.environment }}
         domain:  ${{ needs.issue-analyzer.outputs.domain }}
@@ -94,11 +109,12 @@ jobs:
     needs: 
       - issue-analyzer
       - pre_release_check
+      - fetch-all-envs
     uses:  flxbl-io/sfops-gh-actions/.github/workflows/release-to-an-env.yml@main
     strategy:
       fail-fast: false
       matrix:
-        environment: [ 'staging', 'prod']
+        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
     with:
         org-name:  ${{ matrix.environment }}
         domain:  ${{ needs.issue-analyzer.outputs.domain }}
