@@ -106,7 +106,6 @@ jobs:
         environment: ${{ matrix.environment }}
         environment-profile: ${{ matrix.environment }}
         branchname: releasedefns
-        additional-plugins: 'skuid-sfdx'
         overrideSkipIfAlreadyInstalled: ${{ needs.issue-analyzer.outputs.forceInstall}}
         source-repo-url: https://github.com/flxbl-io/sf-core
         target-repo: flxbl-io/sfops-dashboard
