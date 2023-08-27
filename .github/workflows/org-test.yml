@@ -33,6 +33,7 @@ jobs:
   test:
     name: 'Test in  ${{matrix.environment}}'
     runs-on: ubuntu-latest
+    needs: fetch-all-envs
     container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
     strategy:
       fail-fast: false
