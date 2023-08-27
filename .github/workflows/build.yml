@@ -34,12 +34,16 @@ jobs:
       - name: Figure out the last tagged commit id
         id: commit-finder
         run: |
-            last_tag=$(git describe --tags --match '*_v*' --abbrev=0 2>/dev/null)
+            last_tag=$(git describe --tags --match '*_v*' --abbrev=0 2>/dev/null || true)
+
             if [ -z "$last_tag" ]; then
+              echo "No tags found."
               echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_ENV
             else
+              echo "Tag found: $last_tag"
               echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_ENV
             fi
+        
 
       - name: 'Figure Impacted Release Defns'
         uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
