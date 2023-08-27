@@ -107,12 +107,32 @@ jobs:
           name: build-artifacts
           path: artifacts
   
+  fetch-all-envs:
+    needs: consolidateartifacts
+    runs-on: ubuntu-latest
+    outputs:
+      allEnvsAsJSON: ${{ steps.fetchAllEnvs.outputs.allEnvsAsJSON }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
+        id: fetchAllEnvs
+        with:
+          gh_token: ${{ secrets.GHA_TOKEN }}
+          filter: "type:test"
+
   deploy:
+     strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
      needs: 
-       - consolidateartifacts
+       - fetch-all-envs
      uses:   flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
      with:
-       environment: 'QA'
+       environment: ${{ matrix.environment }}
        environment-profile: 'qa'
      secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
@@ -121,43 +141,12 @@ jobs:
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
 
-  deploySIT:
-     needs: 
-       - consolidateartifacts
-     uses:  flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
-     with:
-       environment: 'SIT'
-       environment-profile: 'sit'
-     secrets:
-      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
-      gh-token: ${{ secrets.GHA_TOKEN }}
-      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
-      datadog-host: ${{ secrets.DATADOG_HOST }}
-
-  deployMASTERDEV:
-     needs: 
-       - consolidateartifacts
-     uses:   flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
-     with:
-       environment: 'MASTERDEV'
-       environment-profile: 'qa'
-     secrets:
-      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
-      gh-token: ${{ secrets.GHA_TOKEN }}
-      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
-      datadog-host: ${{ secrets.DATADOG_HOST }}
-
-   
-  
   publish:
     name: 'publish'
     runs-on: ubuntu-latest
     container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
     needs: 
-      - deployMASTERDEV
-      - deploySIT
+      - deploy
       - analyze
       - build
     strategy:
