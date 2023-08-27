@@ -127,7 +127,7 @@ jobs:
       - name: 'Validate Against ci'
         run: |
          echo 'y' | sfdx plugins:install skuid-sfdx
-          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck  --disablesourcepkgoverride --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
       - name: Create Message Body as File
