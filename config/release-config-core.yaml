@@ -2,8 +2,8 @@ releaseName: frameworks
 domainNameUsedForPools: CORE
 excludeAllPackageDependencies: true 
 includeOnlyArtifacts:
-# orgshape and core-objects are shared so added here as well
   - feature-management
+  - unpackaged
 releasedefinitionProperties:
   promotePackagesBeforeDeploymentToOrg: prod
   skipIfAlreadyInstalled: true
