@@ -38,10 +38,10 @@ jobs:
 
             if [ -z "$last_tag" ]; then
               echo "No tags found."
-              echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_ENV
+              echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_OUTPUT
             else
               echo "Tag found: $last_tag"
-              echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_ENV
+              echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_OUTPUT
             fi
         
 
