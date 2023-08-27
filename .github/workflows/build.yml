@@ -132,7 +132,7 @@ jobs:
      strategy:
       fail-fast: false
       matrix:
-        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
+        environment: ${{  fromJSON(needs.fetch-all-envs.outputs.allEnvsAsJSON) }}
      needs: 
        - fetch-all-envs
      uses:   flxbl-io/sfops-gh-actions/.github/workflows/deploy-to-an-env.yml@main
