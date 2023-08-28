@@ -55,6 +55,33 @@
             ],
             "hashId": "1e6dfa7068e3e3f42c45e09b23cbdc418145ae38",
             "date": "Mon Aug 28 2023 12:37:51 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "-28-08-6000031953"
+            ],
+            "buildNumber": 2,
+            "workItems": {},
+            "artifacts": [
+                {
+                    "name": "unpackaged",
+                    "from": "c6630c99",
+                    "to": "8d7b2572",
+                    "version": "1.0.4.6000031953",
+                    "latestCommitId": "ede68574",
+                    "commits": []
+                },
+                {
+                    "name": "feature-management",
+                    "from": "c6630c99",
+                    "to": "8d7b2572",
+                    "version": "1.0.4.1",
+                    "latestCommitId": "55ef8227",
+                    "commits": []
+                }
+            ],
+            "hashId": "a5564c71dc3c32f85b4c9ab183b30fbf65fedfac",
+            "date": "Mon Aug 28 2023 13:00:17 GMT+0000 (Coordinated Universal Time)"
         }
     ]
 }
