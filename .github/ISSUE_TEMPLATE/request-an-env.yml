@@ -1,0 +1,35 @@
+name: Request a  new environment
+description: This issue allows you to request a new environment'
+title: "Ops - Request a new environment"
+labels: ["ops","ops-env-request"]
+body:
+  - type: input
+    id: type
+    attributes:
+      label: Provide the type of the environment
+      description: Valid values are one of  dev / test /release
+  - type: input
+    id: name
+    attributes:
+      label: Provide the name of the org
+      description: Provide the name of the org, Any name more than 10 characters will be truncated
+    validations:
+      required: true
+  - type: input
+    id: sourceSB
+    attributes:
+      label: Provide the source  for this org
+      description: Leave blank if you want to create a new org, If you want to clone an existing org please provide the name of the org
+  - type: input
+    id: license
+    attributes:
+      label: Provide the license type for this org
+      description: If you do not want it to be based on source for this org, provider attriubutes
+  - type: input
+    id: envApprover
+    attributes:
+       label: Do you want an environment approval for this org?
+       description: If yes, please enter the github handle of the approvers, Multiple users can be seperated by commas
+
+
+

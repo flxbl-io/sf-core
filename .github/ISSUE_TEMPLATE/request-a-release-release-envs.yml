@@ -1,6 +1,6 @@
 name: Request a release into release envs
 description: This issue allows you to request a release of a domain into Staging and Production, Please note these environments need approvals and is connected from a pipeline perspective'
-title: "Ops - Release a domain into staging/prod"
+title: "Ops - Release a domain into release envs"
 labels: ["ops","ops-release-request"]
 body:
   - type: input
