@@ -10,7 +10,7 @@
       "path": "unpackaged",
       "package": "unpackaged",
       "versionNumber": "1.0.1.NEXT",
-      "packageType": "diff",
+      "type": "diff",
       "default": true
     }
   ],

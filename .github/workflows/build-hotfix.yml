@@ -88,7 +88,7 @@ jobs:
           sfpowerscripts orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
         env:
          NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
-         GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
+         GH_TOKEN: ${{ secrets.GHA_TOKEN }}
 
       - name: Compute Release Name
         run: |
@@ -108,7 +108,7 @@ jobs:
            sfpowerscripts changelog:generate -b releasedefns  -d artifacts -w "{{ customer.jira_regex }}" -r "https://flxbl.atlassian.net" -n hotfix-${{ steps.get-domain.outputs.domain}}-$(date +'%d-%m')-${{github.run_id}} --directory orde-hotfix
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
+          GH_TOKEN: ${{ secrets.GHA_TOKEN }}
 
       - name: 'Report changelog'
         uses: flxbl-io/sfops-gh-actions/changelogReporter@main  
