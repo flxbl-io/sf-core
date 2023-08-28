@@ -183,7 +183,7 @@ jobs:
         run: |
           sfpowerscripts orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
          
 
@@ -194,7 +194,7 @@ jobs:
            sfpowerscripts releasedefinition:generate -b releasedefns  -c  HEAD  -d ${{matrix.releaseName}} -f  ${{matrix.filePath}} -n $RELEASE_NAME
            sfpowerscripts changelog:generate -b releasedefns  -d artifacts -w "(ABC)" -r "https://flxbl.atlassian.net" -n $RELEASE_NAME --directory ${{matrix.releaseName}}  
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
 
   
