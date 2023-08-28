@@ -87,7 +87,7 @@ jobs:
         run: |
           sfpowerscripts orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
 
       - name: Compute Release Name
@@ -125,7 +125,7 @@ jobs:
         uses: flxbl-io/sfops-gh-actions/cherrypickAndCreatePR@main
         continue-on-error: true
         with:
-          git-user-email: build-bot@orde.com.au
+          git-user-email: ciuser@flxbl.io
           git-user-name: build-bot
           gh_token: ${{ secrets.GHA_TOKEN }}
           target-branch: 'main'
@@ -135,7 +135,7 @@ jobs:
         with:
          message: |
              This work item  is now published in the following release defn  ${{env.RELEASE_NAME}} .
-             The link is available at https://flxbl-io.github.io/changelog/changelog-orde-hotfix.html#${{env.RELEASE_NAME}}
+             The link is available at https://flxbl-io.github.io/changelog/changelog-hotfix.html#${{env.RELEASE_NAME}}
 
 
 
