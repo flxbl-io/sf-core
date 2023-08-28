@@ -114,20 +114,20 @@ jobs:
           gh_token: ${{ secrets.GHA_TOKEN }}
 
 
-      - name: 'Authenticate ci'
-        run: |
-           sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
-           sfdx alias set ci=buildbot@orde.com.au.${{ steps.fetchCISandbox.outputs.sbxname }}
+      - name: Authenticate to ${{ inputs.environment }}
+        id: handle-auth
+        uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
+        with: 
+          DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+          org-name: ${{ steps.fetchCISandbox.outputs.sbxname }} 
+          environment-profile: ci
 
-      - name: 'Set Email Deliverability to All Email'
-        run: |
-             bash scripts/envSettings.sh ci
+
 
       # Validate source and trigger test
       - name: 'Validate Against ci'
         run: |
-         echo 'y' | sfdx plugins:install skuid-sfdx
-          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck  --disablesourcepkgoverride --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
       - name: Create Message Body as File
