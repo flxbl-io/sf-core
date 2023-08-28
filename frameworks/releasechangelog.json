@@ -1,0 +1,60 @@
+{
+    "orgs": [],
+    "releases": [
+        {
+            "names": [
+                "-28-08-5999803337"
+            ],
+            "buildNumber": 1,
+            "workItems": {},
+            "artifacts": [
+                {
+                    "name": "unpackaged",
+                    "to": "c6630c99",
+                    "version": "1.0.3.5999803337",
+                    "latestCommitId": "ede68574",
+                    "commits": [
+                        {
+                            "commitId": "ede68574",
+                            "date": "2023-08-28T04:58:47+10:00",
+                            "author": "azlam-abdulsalam",
+                            "message": "fix: add feature-management as unlocked",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "a36242a5",
+                            "date": "2023-08-28T02:44:44+10:00",
+                            "author": "azlam-abdulsalam",
+                            "message": "fix: add dummy unpackaged",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "4fe77e4a",
+                            "date": "2023-08-27T10:39:04+10:00",
+                            "author": "azlam-abdulsalam",
+                            "message": "feat: add default directory",
+                            "body": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "feature-management",
+                    "to": "c6630c99",
+                    "version": "1.0.3.1",
+                    "latestCommitId": "55ef8227",
+                    "commits": [
+                        {
+                            "commitId": "55ef8227",
+                            "date": "2023-08-27T11:57:41+10:00",
+                            "author": "azlam-abdulsalam",
+                            "message": "feat: add new package feature-management",
+                            "body": ""
+                        }
+                    ]
+                }
+            ],
+            "hashId": "1e6dfa7068e3e3f42c45e09b23cbdc418145ae38",
+            "date": "Mon Aug 28 2023 12:37:51 GMT+0000 (Coordinated Universal Time)"
+        }
+    ]
+}
