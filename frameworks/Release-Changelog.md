@@ -1,4 +1,22 @@
 
+<a id=836c3c415c62e87517a08df8d98a6c8ed11fd1c2></a>
+# Sprint-1-29-08-6006351811
+ Cumulative Release Number: <b>6</b> 
+
+Matching defintion first created or deployed to an org on: Tue Aug 29 2023 00:29:47 GMT+0000 (Coordinated Universal Time)
+ ### Artifacts :package:
+- **feature-management**     v1.0.7.1 (357455a2)
+
+### Work Items :gem:
+N/A
+
+### Commits :book:
+N/A
+
+### Additional Information
+The following artifacts' version may have changed due to an update in the scratch org definition file, incremented package version in SFDX project configuration, or build all packages:
+  - feature-management
+
 <a id=246f3f39490018a5a77d0c80204dcfb39663bdca></a>
 # Sprint-1-29-08-6006206698
  Cumulative Release Number: <b>5</b> 
