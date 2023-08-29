@@ -136,6 +136,25 @@
             ],
             "hashId": "c6bc37c7d8e67bc651949340a10b5fac27515c66",
             "date": "Mon Aug 28 2023 14:55:03 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-1-29-08-6006206698"
+            ],
+            "buildNumber": 5,
+            "workItems": {},
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "from": "10c1b98b",
+                    "to": "2c224bb0",
+                    "version": "1.0.6.1",
+                    "latestCommitId": "55ef8227",
+                    "commits": []
+                }
+            ],
+            "hashId": "246f3f39490018a5a77d0c80204dcfb39663bdca",
+            "date": "Tue Aug 29 2023 00:13:35 GMT+0000 (Coordinated Universal Time)"
         }
     ]
 }
