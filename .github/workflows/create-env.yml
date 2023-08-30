@@ -87,7 +87,6 @@ jobs:
   close_issue:
      runs-on: ubuntu-latest
      needs:  execute_action
-     if: contains(github.event.issue.title, 'Ops - Update release name')
      steps:
 
       # gh needs a repo bummer
