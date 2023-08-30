@@ -59,6 +59,7 @@ jobs:
   
 
   build-deploy-publish:
+    name: 'Build, Deploy & Publish ${{ matrix.releaseName }}'
     needs: 
       - analyze
     strategy:
