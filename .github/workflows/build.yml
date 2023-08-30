@@ -58,7 +58,7 @@ jobs:
            echo "matrix=$(jq -c . < ./impacted-releases.json)" >> $GITHUB_OUTPUT
   
 
-  deploy:
+  build-deploy-publish:
     needs: 
       - analyze
     strategy:
@@ -69,7 +69,7 @@ jobs:
        releaseconfig: ${{ matrix.filePath }}
        domain: ${{ matrix.releaseName }}
        branchname: main
-       allReleaseNames: ${{ matrix.allReleaseNames }}
+       allReleaseNames: "frameworks,unpackaged"
        dashboard-repo: sfops-dashboard
        releasename: ${{ vars.releaseName }}
        workitem-url: 'https://flxbl.atlassian.net'
