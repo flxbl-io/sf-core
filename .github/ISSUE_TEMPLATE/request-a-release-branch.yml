@@ -1,12 +1,13 @@
 name: Request a release branch for hotfix
 description: This issue allows you to a request a release branch updated to a particular release defn
-title: "Dev - Request a release branch from a release definition"
+title: "Dev - Request a release branch to be created from a release definition"
 labels: ["dev","dev-release-branch-request"]
 body:
   - type: input
     id: domain
-    label: Enter domain
-    description: Enter the domain name that contains the release definition
+    attributes:
+      label: Enter domain
+      description: Enter the domain name that contains the release definition
   - type: input
     id: releasedefn
     attributes:

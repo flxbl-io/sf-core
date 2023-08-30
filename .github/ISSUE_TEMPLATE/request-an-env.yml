@@ -1,5 +1,5 @@
-name: Request a  new environment
-description: This issue allows you to request a new environment'
+name: Request a new environment
+description: This issue allows you to request a new environment to be added to the test/release pipelines. Please note the sandbox should be ready and activated by the same devhub user configured in Github'
 title: "Ops - Request a new environment"
 labels: ["ops","ops-env-request"]
 body:
