@@ -7,9 +7,9 @@ body:
     id: type
     attributes:
       options:
-        - DEV
-        - TEST
-        - RELEASE
+        - dev
+        - test
+        - release
       label: Provide the type of the environment
       description: Valid values are one of  dev / test /release
   - type: input
