@@ -70,8 +70,8 @@ jobs:
        releaseconfig: ${{ matrix.filePath }}
        domain: ${{ matrix.releaseName }}
        branchname: main
-       allReleaseNames: "frameworks,unpackaged"
        dashboard-repo: sfops-dashboard
+       pathToReleaseConfigs: 'config'
        releasename: ${{ vars.releaseName }}
        workitem-url: 'https://flxbl.atlassian.net'
        workitem-filter: '(ABC|DEF)-[0-9]{3,4}'
