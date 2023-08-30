@@ -3,9 +3,13 @@ description: This issue allows you to request a new environment to be added to t
 title: "Ops - Request a new environment"
 labels: ["ops","ops-env-request"]
 body:
-  - type: input
+  - type: dropdown
     id: type
     attributes:
+      options:
+        - DEV
+        - TEST
+        - RELEASE
       label: Provide the type of the environment
       description: Valid values are one of  dev / test /release
   - type: input
