@@ -1,0 +1,115 @@
+name: 'IssueOps - Create an Environment'
+run-name: 'Create an environment -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+on:
+  issues:
+    types: [ opened ]
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+  issue-analyzer:
+    if: contains(github.event.issue.title, 'Ops - Request a new environment')
+    runs-on: ubuntu-latest
+    outputs:
+      type: ${{ steps.issue-parser.outputs.issueparser_type  }}
+      name: ${{ steps.issue-parser.outputs.issueparser_name }}
+      envApprover: ${{ steps.issue-parser.outputs.issueparser_envApprovers }}
+      branch: ${{ steps.issue-parser.outputs.issueparser_branch }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/request-an-env.yml      
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GHA_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [ "ops", "ops-request-an-env"]
+            })
+
+      - name: Create Comment before initiating action
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Your request has been received and is being processed.  A new environment with ${{ steps.issue-parser.outputs.issueparser_type  }} type 
+            and ${{ steps.issue-parser.outputs.issueparser_name }} name will be created shortly.  
+            
+            The job run can be tracked at the link at https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+          
+           
+
+  execute_action:
+    runs-on: ubuntu-latest
+    needs: issue-analyzer
+    if: contains(github.event.issue.title, 'Ops - Request a new environment')
+    steps:
+
+     # gh needs a repo bummer
+     - uses: actions/checkout@v3
+
+     - name: Create environments
+       uses: thijsvtol/create-environments@main
+       with:
+          token: ${{ secrets.GHA_TOKEN }}
+          repo: ${{ github.repository }}
+          environments: ${{ needs.issue-analyzer.outputs.name }}
+          required_reviewers:  ${{ needs.issue-analyzer.outputs.envApprover }}
+
+     - name: Setup Environment Variables
+       run: |
+          gh variable set  BRANCH  -e ${{ needs.issue-analyzer.outputs.name }}  --repo  ${{ github.repository }} -b  ${{ needs.issue-analyzer.outputs.branch }}
+          gh variable set  TYPE  -e ${{ needs.issue-analyzer.outputs.name }}  --repo  ${{ github.repository }} -b  ${{ needs.issue-analyzer.outputs.type }}
+          gh variable set  SBX_NAME  -e ${{ needs.issue-analyzer.outputs.name }}  --repo  ${{ github.repository }} -b  ${{ needs.issue-analyzer.outputs.name }} 
+          
+      
+  close_issue:
+     runs-on: ubuntu-latest
+     needs:  execute_action
+     if: contains(github.event.issue.title, 'Ops - Update release name')
+     steps:
+
+      # gh needs a repo bummer
+      - uses: actions/checkout@v3
+
+      - name: Close Issue
+        run: |
+         gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: \n Your request has been sucessfully processed" -r "Completed"
+        env:
+           GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+
+  comment_issue_on_error:
+      runs-on: ubuntu-latest
+      needs:   execute_action
+      if: always() && needs.execute_action.result == 'failure'
+      steps:
+
+      - name: Create Comment after failure
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Apologies, it seems we ran into an issue, This would need your manual attention please check the job run
+            at the link https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

@@ -12,19 +12,16 @@ body:
     id: name
     attributes:
       label: Provide the name of the org
-      description: Provide the name of the org, Any name more than 10 characters will be truncated
+      description: Provide the name of the org, Any name more than 10 characters will be truncated, if the org is not can be authenticated using the authenticated devhub user, you will need to set up a SB_SFDX_AUTH_URL secret in the environment
     validations:
       required: true
   - type: input
-    id: sourceSB
+    id: branch
     attributes:
-      label: Provide the source  for this org
-      description: Leave blank if you want to create a new org, If you want to clone an existing org please provide the name of the org
-  - type: input
-    id: license
-    attributes:
-      label: Provide the license type for this org
-      description: If you do not want it to be based on source for this org, provider attriubutes
+      label: Provide the branch associated with the org
+      description: The org will be associated with artifacts released from this branch
+    validations:
+      required: true
   - type: input
     id: envApprover
     attributes:
