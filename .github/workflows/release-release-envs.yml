@@ -65,6 +65,10 @@ jobs:
 
             If this is a mistake, please close this issue, cancel the above action and raise a new issue with the correct details
 
+      - name: Print Job Summary
+        run: |
+          echo "The issue  for this particular release is https://github.com/${{github.repository}}/issues/${{github.event.issue.number}}" >> $GITHUB_STEP_SUMMARY
+
   fetch-all-envs:
     needs: issue-analyzer
     runs-on: ubuntu-latest
