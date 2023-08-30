@@ -33,7 +33,7 @@ jobs:
       - uses: stefanbuck/github-issue-parser@v3
         id: issue-parser
         with:
-          template-path: .github/ISSUE_TEMPLATE/request-a-release-staging-prod.yml
+          template-path: .github/ISSUE_TEMPLATE/request-a-release-release-envs.yml
 
       - uses: actions/github-script@v6
         with:
@@ -69,9 +69,10 @@ jobs:
         run: |
           echo "The issue  for this particular release is https://github.com/${{github.repository}}/issues/${{github.event.issue.number}}" >> $GITHUB_STEP_SUMMARY
 
-  fetch-all-envs:
+  fetch-release-envs:
     needs: issue-analyzer
     runs-on: ubuntu-latest
+    name: Fetch all release envs
     outputs:
       allEnvsAsJSON: ${{ steps.fetchAllEnvs.outputs.allEnvsAsJSON }}
     steps:
@@ -86,12 +87,14 @@ jobs:
           filter: "type:release"
 
   pre_release_check:
-    needs: fetch-all-envs
+    needs: 
+      - fetch-release-envs
+      - issue-analyzer
     uses:  flxbl-io/sfops-gh-actions/.github/workflows/pre-release-check.yml@main
     strategy:
       fail-fast: false
       matrix:
-        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
+        environment: ${{  fromJSON(needs.fetch-release-envs.outputs.allEnvsAsJSON) }}
     with:
         sbxname:  ${{ matrix.environment }}
         domain:  ${{ needs.issue-analyzer.outputs.domain }}
@@ -102,23 +105,25 @@ jobs:
         overridePackageVersions: ${{ needs.issue-analyzer.outputs.overridePackageVersions }}
         excludePackages: ${{ needs.issue-analyzer.outputs.excludePackages }}
         issue-number: ${{github.event.issue.number}}
+        releaselogbranch: releaselogs
         issue-author: ${{github.event.issue.user.login}}
         issue-notifier: 'flxbl-io/sf-core'
         metrics-provider: 'datadog'
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+        SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
         gh-token: ${{ secrets.GHA_TOKEN }}
       
-  execute_action:
+  release-to-orgs:
     needs: 
       - issue-analyzer
       - pre_release_check
-      - fetch-all-envs
+      - fetch-release-envs
     uses:  flxbl-io/sfops-gh-actions/.github/workflows/release-to-an-env.yml@main
     strategy:
       fail-fast: false
       matrix:
-        environment: ${{ needs.fetch-all-envs.outputs.allEnvsAsJSON }}
+        environment: ${{  fromJSON(needs.fetch-release-envs.outputs.allEnvsAsJSON) }}
     with:
         org-name:  ${{ matrix.environment }}
         domain:  ${{ needs.issue-analyzer.outputs.domain }}
@@ -134,8 +139,10 @@ jobs:
         excludePackages: ${{ needs.issue-analyzer.outputs.excludePackages }}
         issue-number: ${{github.event.issue.number}}
         issue-author: ${{github.event.issue.user.login}}
+        releaselogbranch: releaselogs
         issue-notifier: 'flxbl-io/sf-core'
         metrics-provider: 'datadog'
+        pathToReleaseConfigs: 'config'
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
@@ -147,7 +154,7 @@ jobs:
       
   close_issue:
      runs-on: ubuntu-latest
-     needs:  execute_action
+     needs:   release-to-orgs
      steps:
 
       # gh needs a repo bummer
@@ -161,7 +168,7 @@ jobs:
 
   comment_issue_on_error:
       runs-on: ubuntu-latest
-      needs:   execute_action
+      needs:   release-to-orgs
       if: always() && needs.execute_action.result == 'failure'
       steps:
 
