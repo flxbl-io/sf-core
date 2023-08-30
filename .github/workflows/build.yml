@@ -76,7 +76,7 @@ jobs:
        workitem-filter: '(ABC|DEF)-[0-9]{3,4}'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-      gh-token: ${{ secrets.GHA_TOKEN }}
+      gh_token: ${{ secrets.GHA_TOKEN }}
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
 
