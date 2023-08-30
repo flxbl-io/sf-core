@@ -112,7 +112,7 @@ jobs:
 
       - name: Close Issue
         run: |
-         gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: \n Your request has been sucessfully processed" -r "Completed"
+         gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: /n Your request has been sucessfully processed" -r "Completed"
         env:
            GH_TOKEN: ${{ secrets.GHA_TOKEN }}
   
