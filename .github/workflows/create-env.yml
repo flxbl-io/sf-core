@@ -76,6 +76,8 @@ jobs:
           required_reviewers:  ${{ needs.issue-analyzer.outputs.envApprover }}
 
      - name: Setup Environment Variables
+       env:
+          GH_TOKEN: ${{ secrets.GHA_TOKEN }}
        run: |
           gh variable set  BRANCH  -e ${{ needs.issue-analyzer.outputs.name }}  --repo  ${{ github.repository }} -b  ${{ needs.issue-analyzer.outputs.branch }}
           gh variable set  TYPE  -e ${{ needs.issue-analyzer.outputs.name }}  --repo  ${{ github.repository }} -b  ${{ needs.issue-analyzer.outputs.type }}
