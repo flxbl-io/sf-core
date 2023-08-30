@@ -1,8 +1,7 @@
-releaseName: frameworks
+releaseName: unpackaged
 domainNameUsedForPools: CORE
 excludeAllPackageDependencies: true 
 includeOnlyArtifacts:
-  - feature-management
   - unpackaged
 releasedefinitionProperties:
   promotePackagesBeforeDeploymentToOrg: prod
