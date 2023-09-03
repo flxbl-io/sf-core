@@ -1,7 +1,7 @@
 # build all packages
 
 
-name: 'Build-main'
+name: 'Build-Test-Publish'
 
 
 on:
@@ -62,6 +62,7 @@ jobs:
     name: 'Build, Deploy & Publish ${{ matrix.releaseName }}'
     needs: 
       - analyze
+    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
@@ -69,9 +70,9 @@ jobs:
     with:
        releaseconfig: ${{ matrix.filePath }}
        domain: ${{ matrix.releaseName }}
-       branchname: main
-       dashboard-repo: sfops-dashboard
+       branchname: ${{ github.ref_name }}
        pathToReleaseConfigs: 'config'
+       dashboard-repo: sfops-dashboard
        releasename: ${{ vars.releaseName }}
        workitem-url: 'https://flxbl.atlassian.net'
        workitem-filter: '(ABC|DEF)-[0-9]{3,4}'

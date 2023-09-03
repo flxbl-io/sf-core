@@ -92,6 +92,7 @@ jobs:
     name: 'Validate Changed Packages'
     runs-on: ubuntu-latest
     container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
     needs: analyze
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
@@ -114,20 +115,20 @@ jobs:
           gh_token: ${{ secrets.GHA_TOKEN }}
 
 
-      - name: Authenticate to ${{ inputs.environment }}
-        id: handle-auth
-        uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
-        with: 
-          DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          org-name: ${{ steps.fetchCISandbox.outputs.sbxname }} 
-          environment-profile: ci
+      - name: 'Authenticate ci'
+        run: |
+           sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
+           sfdx alias set ci=buildbot@orde.com.au.${{ steps.fetchCISandbox.outputs.sbxname }}
 
-
+      - name: 'Set Email Deliverability to All Email'
+        run: |
+             bash scripts/envSettings.sh ci
 
       # Validate source and trigger test
       - name: 'Validate Against ci'
         run: |
-          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck  --disablesourcepkgoverride --disableartifactupdate --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+         echo 'y' | sfdx plugins:install skuid-sfdx
+          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
       - name: Create Message Body as File
@@ -144,6 +145,12 @@ jobs:
           fi
           if [ -f .sfpowerscripts/outputs/build-error-info.md ]; then
             cat .sfpowerscripts/outputs/build-error-info.md >> message.md
+          fi
+          if [ -f .sfpowerscripts/outputs/deployment-error.md.md ]; then
+           cat .sfpowerscripts/outputs/deployment-error.md.md >> message.md
+          fi
+          if [ -f .sfpowerscripts/outputs/validation-error.md.md ]; then
+            cat .sfpowerscripts/outputs/validation-error.md.md >> message.md
           fi
 
       - uses: mshick/add-pr-comment@v2
@@ -178,3 +185,5 @@ jobs:
     steps:
       - run: exit 1
         if: ${{  contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+      - run: exit 0
+        if: ${{  contains(needs.*.result, 'skipped') }}
