@@ -16,6 +16,7 @@ env:
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
 
+
 jobs:
   build:
     name: 'Build packages'
@@ -87,8 +88,8 @@ jobs:
         run: |
           sfpowerscripts orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
-         GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
 
       - name: Compute Release Name
         run: |
@@ -105,10 +106,10 @@ jobs:
         if: always()
         run: |
            sfpowerscripts releasedefinition:generate -b releasedefns  -c  HEAD  -d orde-hotfix -f  config/release-config-${{ steps.get-domain.outputs.domain}}.yaml -n hotfix-${{ steps.get-domain.outputs.domain}}-$(date +'%d-%m')-${{github.run_id}}
-           sfpowerscripts changelog:generate -b releasedefns  -d artifacts -w "{{ customer.jira_regex }}" -r "https://flxbl.atlassian.net" -n hotfix-${{ steps.get-domain.outputs.domain}}-$(date +'%d-%m')-${{github.run_id}} --directory orde-hotfix
+           sfpowerscripts changelog:generate -b releasedefns  -d artifacts -w "${{ customer.jira_regex }}" -r "${{ customer.jira_url }}" -n hotfix-${{ steps.get-domain.outputs.domain}}-$(date +'%d-%m')-${{github.run_id}} --directory hotfix
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHA_TOKEN }}
 
       - name: 'Report changelog'
         uses: flxbl-io/sfops-gh-actions/changelogReporter@main  
@@ -135,7 +136,7 @@ jobs:
         with:
          message: |
              This work item  is now published in the following release defn  ${{env.RELEASE_NAME}} .
-             The link is available at https://flxbl-io.github.io/changelog/changelog-hotfix.html#${{env.RELEASE_NAME}}
+             The link is available at https://flxbl-io.github.io/changelog/changelog-orde-hotfix.html#${{env.RELEASE_NAME}}
 
 
 
