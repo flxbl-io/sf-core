@@ -1,8 +1,20 @@
-name: Request a release into release envs
+name: Request a release into staging/prod
 description: This issue allows you to request a release of a domain into Staging and Production, Please note these environments need approvals and is connected from a pipeline perspective'
-title: "Ops - Release a domain into release envs"
+title: "Ops - Release a domain into staging/prod"
 labels: ["ops","ops-release-request"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions!
+
+        This issue template is used to release a new release candidate into Staging/Production
+        Please click on the action link from your release candidate dashboard to create this issue
+
+        ## :warning: Warnings
+        - Please close any open failed release request before creating a new one to reduce confusions
+        - This issue only releases a particular domain, if you have multiple domains please create a new issue for each domain in the order of your dependencie
+
   - type: input
     id: domain
     attributes:
@@ -12,7 +24,7 @@ body:
     id: releasedefn
     attributes:
       label: Provide the release definition
-      description: You can visit the  sfops  dashboard and pick the release number that you want to be deployed to the org
+      description: You can visit the  sfops dashboard and pick the release number that you want to be deployed to the org
     validations:
       required: true
   - type: input

@@ -9,11 +9,11 @@ body:
       label: Pick an environment where the package should be installed to
       description: The environment name should match the environments configured in github actions
       options:
-         - label: QA
-         - label: SIT
-         - label: MASTERDEV
-         - label: STAGING
-         - label: PROD
+         - label: qa
+         - label: uat
+         - label: golden_sb
+         - label: staging
+         - label: prod
   - type: input
     id: packageId
     attributes:

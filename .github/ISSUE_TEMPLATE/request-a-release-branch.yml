@@ -1,17 +1,19 @@
 name: Request a release branch for hotfix
 description: This issue allows you to a request a release branch updated to a particular release defn
-title: "Dev - Request a release branch to be created from a release definition"
+title: "Dev - Request a release branch from a release definition"
 labels: ["dev","dev-release-branch-request"]
 body:
   - type: input
     id: domain
     attributes:
-      label: Enter domain
-      description: Enter the domain name that contains the release definition
+      label: Provide the domain
+      description: You can visit the  sfops dashboard and pick the domain that this release definition is associated with
+    validations:
+      required: true
   - type: input
     id: releasedefn
     attributes:
       label: Provide the release definition
-      description: You can visit the  sfops  dashboard and pick the release number that you want a release branch to be patched with
+      description: You can visit the  sfops dashboard and pick the release number that you want a release branch to be patched with
     validations:
       required: true

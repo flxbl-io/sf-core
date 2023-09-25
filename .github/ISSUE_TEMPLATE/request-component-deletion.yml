@@ -3,6 +3,32 @@ description: This issue allows you to test the deletion of components from highe
 title: "Ops - Deletion of a components from Org"
 labels: ["ops","ops-deletion-of-component"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions!
+
+        This automation can only be used for deleting components from the org that are currently
+        not part of an existing unlocked package. It uses a just in time version of org dependent
+        unlocked package to delete the component, hence only components that can be packaged can be
+        used by this automation. You can check the metadata types covered by unlocked package 
+        [here](https://developer.salesforce.com/docs/metadata-coverage)
+
+        ## :warning: Warning
+
+        Please use the issue template to test it on your developer enviormnent, before applying change else where
+        You can use the link to the issue template below
+        
+        https://github.com/flxbl-io/sf-core/issues/new?assignees=&labels=ops%2Cops-test-deletion-of-component&projects=&template=request-component-deletion-test.yml&title=Ops+-+Test+Deletion+of+a+components
+
+
+        ### Please note this automation will not remove components from version control
+
+        ## Examples
+        You need to provide the type of metadata and name of metadata in coma seperated string.
+        ``` ApexClass:ContactApprovalTest ```
+        If you have multiple items  you need to provide as below
+        ``` ApexClass:ContactApprovalTest,ApexClass:LeadTest  ```
   - type: input
     id: components
     attributes:
@@ -16,9 +42,9 @@ body:
       label: Pick environments where the component should be deleted from
       description: The environment name should match the environments configured in github actions
       options:
-         - label: QA
-         - label: SIT
-         - label: MASTERDEV
-         - label: STAGING
-         - label: PROD
+         - label: qa
+         - label: uat
+         - label: golden_sb
+         - label: staging
+         - label: prod
  

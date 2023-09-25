@@ -3,6 +3,22 @@ description: This issue allows you to test the deletion of components from a dev
 title: "Ops - Test Deletion of a components"
 labels: ["ops","ops-test-deletion-of-component"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions!
+
+        This automation can only be used for deleting components from the org that are currently
+        not part of an existing unlocked package. It uses a just in time version of org dependent
+        unlocked package to delete the component, hence only components that can be packaged can be
+        used by this automation. You can check the metadata types covered by unlocked package 
+        [here](https://developer.salesforce.com/docs/metadata-coverage)
+
+        ## Examples
+        You need to provide the type of metadata and name of metadata in coma seperated string.
+        ``` ApexClass:ContactApprovalTest ```
+        If you have multiple items  you need to provide as below
+        ``` ApexClass:ContactApprovalTest,ApexClass:LeadTest  ```
   - type: input
     id: components
     attributes:
