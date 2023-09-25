@@ -61,8 +61,8 @@ jobs:
       - name: Set Output
         id: issue-analyzer-output
         run: |
-            echo "profiles= ${{ steps.issue-parser.outputs.issueparser_profiles }}" >> "$GITHUB_OUTPUT"
-            echo "targetorg= ${{ steps.issue-parser.outputs.issueparser_targetorg }}" >> "$GITHUB_OUTPUT"
+            echo "profiles=${{ steps.issue-parser.outputs.issueparser_profiles }}" >> "$GITHUB_OUTPUT"
+            echo "targetorg=${{ steps.issue-parser.outputs.issueparser_targetorg }}" >> "$GITHUB_OUTPUT"
 
             IFS=',' read -r -a array <<< "${{ steps.issue-parser.outputs.issueparser_envs }}"
             output="["

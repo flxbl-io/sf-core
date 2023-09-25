@@ -43,3 +43,7 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+
+.sfpowerscripts
+artifacts

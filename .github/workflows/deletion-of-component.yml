@@ -58,8 +58,8 @@ jobs:
       - name: Set Output
         id: issue-analyzer-output
         run: |
-            echo "components= ${{ steps.issue-parser.outputs.issueparser_components }}" >> "$GITHUB_OUTPUT"
-            echo "targetorg= ${{ steps.issue-parser.outputs.issueparser_targetorg }}" >> "$GITHUB_OUTPUT"
+            echo "components=${{ steps.issue-parser.outputs.issueparser_components }}" >> "$GITHUB_OUTPUT"
+            echo "targetorg=${{ steps.issue-parser.outputs.issueparser_targetorg }}" >> "$GITHUB_OUTPUT"
 
             IFS=',' read -r -a array <<< "${{ steps.issue-parser.outputs.issueparser_envs }}"
             output="["
