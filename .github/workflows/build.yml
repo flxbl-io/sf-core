@@ -77,8 +77,8 @@ jobs:
        dashboard-repo: orde-sf-dev-dashboard
        releasename: ${{ vars.releaseName }}
        metrics-provider: 'datadog'
-       workitem-url: 'https://wingategroup.atlassian.net/browse'
-       workitem-filter: '(ODD|OIBCR)-[0-9]{3,4}'
+       workitem-url: 'https://github.com/${{github.repository}}/issues/'
+       workitem-filter: '(ISSUE)-[0-9]{3,4}'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
