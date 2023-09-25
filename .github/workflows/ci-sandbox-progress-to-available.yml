@@ -29,8 +29,8 @@ jobs:
       - name: Check time and exit if not within time range
         run: |
           # Get current hour in AEST
-          HOUR=$(TZ=":Australia/Melbourne" date +"%H")
-          echo $HOUR
+          HOUR=$(TZ="Australia/Melbourne" date +"%H")
+          echo CurrentTime:$HOUR
           if (( HOUR < 8 || HOUR > 23 )); then
             echo "Outside of 8 AM - 11 PM AEST, exiting"
             exit 1
