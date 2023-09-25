@@ -16,7 +16,7 @@ jobs:
   check-ci-sandbox-status:
     runs-on: ubuntu-latest
     continue-on-error: true 
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    container: ghcr.io/dxatscale/sfpowerscripts-rc:main
 
     steps:
       - uses: actions/checkout@v3
