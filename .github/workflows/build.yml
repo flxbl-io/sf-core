@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - 'release/**'
 
   workflow_dispatch:
 
@@ -66,16 +67,18 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
+      max-parallel: 1
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/build-a-domain.yml@main
     with:
        releaseconfig: ${{ matrix.filePath }}
        domain: ${{ matrix.releaseName }}
        branchname: ${{ github.ref_name }}
        pathToReleaseConfigs: 'config'
-       dashboard-repo: sfops-dashboard
+       dashboard-repo: orde-sf-dev-dashboard
        releasename: ${{ vars.releaseName }}
-       workitem-url: 'https://flxbl.atlassian.net'
-       workitem-filter: '(ABC|DEF)-[0-9]{3,4}'
+       metrics-provider: 'datadog'
+       workitem-url: 'https://wingategroup.atlassian.net/browse'
+       workitem-filter: '(ODD|OIBCR)-[0-9]{3,4}'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}

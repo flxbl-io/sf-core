@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
+      - release/*
   workflow_dispatch:
 
 #Set the environment variables for tracking metrics
@@ -18,38 +19,6 @@ env:
 
 jobs:
  
-
-#  commit-lint:
-#     runs-on: ubuntu-latest
-
-#     steps:
-
-#       - uses: actions/checkout@v3
-#         with:
-#           fetch-depth: 0
-
-#       - name: Setup Node
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 16
-#           cache: 'npm'
-
-#       - name: Install dependencies
-#         run: npm ci
-
-#       - name: Validate all commits from PR
-#         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
-
-#       - name: Display in Job Summary
-#         if:  ${{ failure() }}
-#         run: |
-#             npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose > commitlint.md
-#             cat commitlint.md >> $GITHUB_STEP_SUMMARY
-#             gh pr comment ${{ github.event.pull_request.number }} --body-file commitlint.md
-#         env:
-#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
  static:
     name: 'static-analysis-of-Apex-classes-using-PMD'
     runs-on: ubuntu-latest
@@ -95,6 +64,7 @@ jobs:
     if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
     needs: analyze
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v3
@@ -108,17 +78,35 @@ jobs:
   
       # Fetch a sandbox
       - name: 'Fetch CI Sandboxes'
-        uses:  flxbl-io/sfops-gh-actions/fetchCISandbox@main
+        if: github.base_ref == 'main'
+        uses: flxbl-io/sfops-gh-actions/fetchCISandbox@main
         id: fetchCISandbox
         with:
           domain: ${{ matrix.domainNameUsedForPools }}
           gh_token: ${{ secrets.GHA_TOKEN }}
 
+      - name: 'Fetch CI Sandboxes for hotfixes'
+        if:  contains(github.base_ref,'release') || github.base_ref == 'refs/heads/release/**'
+        uses:  flxbl-io/sfops-gh-actions/fetchCISandbox@main
+        id: fetchCISandboxHotfix
+        with:
+          domain: ${{ matrix.domainNameUsedForPools }}
+          gh_token: ${{ secrets.GHA_TOKEN }}
+
+
 
       - name: 'Authenticate ci'
+        if: github.base_ref == 'main'
         run: |
            sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
-           sfdx alias set ci=buildbot@orde.com.au.${{ steps.fetchCISandbox.outputs.sbxname }}
+           sfdx alias set ci=${{ vars.DEVHUB_USERNAME }}.${{ steps.fetchCISandbox.outputs.sbxname }}
+
+      - name: 'Authenticate ci for hotfix'
+        if: contains(github.base_ref,'release') || github.base_ref == 'refs/heads/release/**'
+        run: |
+           sfdx org resume sandbox -n ${{ steps.fetchCISandboxHotfix.outputs.sbxname }} -o devhub
+           sfdx alias set ci=${{ vars.DEVHUB_USERNAME }}.${{ steps.fetchCISandboxHotfix.outputs.sbxname }}
+
 
       - name: 'Set Email Deliverability to All Email'
         run: |
@@ -131,30 +119,56 @@ jobs:
           sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        continue-on-error: true
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          name: Apex Test Reports
+          path: '.testResults/*.xml'
+          reporter: 'java-junit'
+          token: ${{ secrets.GHA_TOKEN }}
+
       - name: Create Message Body as File
         id: message_template
+        if: ${{ always() }}
         run: |
-          echo "Hello  @${{ github.event.pull_request.user.login }}, " > message.md
+          printf "Hello  @${{ github.event.pull_request.user.login }}, " > message.md
+          printf "\nPlease find some information if available regarding your [validation run](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})\n" >> message.md
+          
+          printf "\n##  :crystal_ball:  Validation Summary" >> message.md
+
           if [ -f  .sfpowerscripts/outputs/org-info.md ]; then
+            printf "\n### :o: Org Info" >> message.md
             cat .sfpowerscripts/outputs/org-info.md >> message.md
           fi
+          
           if [ -f .sfpowerscripts/outputs/deployment-breakdown.md ]; then
+            printf "\n### :eyes: Packages Validated\n" >> message.md
             cat .sfpowerscripts/outputs/deployment-breakdown.md >> message.md
           else
-           echo "No changes detected for validation in ${{matrix.filePath}}" >> message.md
+            printf "\n### No changes detected for validation in ${{matrix.filePath}}\n" >> message.md
           fi
+          
           if [ -f .sfpowerscripts/outputs/build-error-info.md ]; then
+            printf "\n### :bangbang: Build Errors" >> message.md
+            printf "\nLooks like we have ran into some issues during the build of your packages \n" >> message.md
             cat .sfpowerscripts/outputs/build-error-info.md >> message.md
+          fi    
+          if [ -f .sfpowerscripts/outputs/deployment-error.md ]; then
+            cat .sfpowerscripts/outputs/deployment-error.md >> message.md
           fi
-          if [ -f .sfpowerscripts/outputs/deployment-error.md.md ]; then
-           cat .sfpowerscripts/outputs/deployment-error.md.md >> message.md
+          printf "\n### :checkered_flag: Status">> message.md
+          if [ -f .sfpowerscripts/outputs/validation-error.md ]; then
+            cat .sfpowerscripts/outputs/validation-error.md >> message.md
+          else
+            printf "\n#### :white_check_mark: No errors detected for validation in ${{matrix.filePath}}\n" >> message.md
           fi
-          if [ -f .sfpowerscripts/outputs/validation-error.md.md ]; then
-            cat .sfpowerscripts/outputs/validation-error.md.md >> message.md
-          fi
+          
 
       - uses: mshick/add-pr-comment@v2
         name: Print Validation Breakdown
+        if: always()
         with:
           allow-repeats: true
           repo-token: ${{ secrets.GHA_TOKEN}}
@@ -163,9 +177,18 @@ jobs:
             
       # Publish logs
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: logs
           path: .sfpowerscripts/logs
+  
+        # Publish testresults
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: testresults
+          path: .testresults
+
 
       # Fetch a sandbox
       - name: 'Release CI Sandboxes'
