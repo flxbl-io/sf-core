@@ -1,0 +1,49 @@
+name: Request a DX@Scale package installation
+description: This issue allows you to request a new managed/unlocked package installation to a target org
+title: "Ops - Install a new managed/unlocked package"
+labels: ["ops", "ops-package-installation-request"]
+body:
+  - type: input
+    id: orgname
+    attributes:
+      label: Name of the org
+      description: Please provide the name of the org, Only orgs created by build bot can be used, If you want to create a new org, please raise an issue first
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Environment Profile
+      description: Environment profiles define the type of metadata for aliasifed packages, Select an env orgs as mentioned in sfdx-project.json , For example ci, qa, uat, prod
+    validations:
+      required: true
+  - type: input
+    id: packageName
+    attributes:
+      label: Name of the package?
+      description: Please provide the name of the package to be installed, the name of the package has to match what is your Github Packages
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version of the package?
+      description: Please provide the full version of the package as seen in your  Github Packages, such as 1.0.0-232323
+    validations:
+      required: true
+  - type: dropdown
+    id: installationmode
+    attributes:
+      label: Pick an installation mode if the requested package is unlocked package
+      description: Unlocked package has various installation mopdes, please pick one
+      options:
+        - delete-only
+        - deprecate-only
+        - mixed-mode
+  - type: checkboxes
+    id: forceInstall
+    attributes:
+      label: Do you want to force install the package?
+      description: If you want to force install the package, please select yes
+      options:
+        - label: "yes"

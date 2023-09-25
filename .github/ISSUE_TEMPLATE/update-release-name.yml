@@ -3,6 +3,13 @@ description: This issue allows you update the prefix name used by release defini
 title: "Ops - Update release name"
 labels: ["ops","ops-new-sprint-request"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions!
+
+        This automation will update the release name used by release definitions, Use it after the current sprint is closed
+        The release name will be prepended before each release definition created by sfops
   - type: input
     id: releasename
     attributes:
