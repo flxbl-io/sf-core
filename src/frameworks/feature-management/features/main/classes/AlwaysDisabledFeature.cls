@@ -9,6 +9,6 @@ public class AlwaysDisabledFeature implements Feature {
      * @return true
      */
     public Boolean isEnabled(String featureName) {
-        return false;
+        return true;
     }
 }
