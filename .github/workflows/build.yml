@@ -74,7 +74,7 @@ jobs:
        domain: ${{ matrix.releaseName }}
        branchname: ${{ github.ref_name }}
        pathToReleaseConfigs: 'config'
-       dashboard-repo: orde-sf-dev-dashboard
+       dashboard-repo: sfops-dashboard
        releasename: ${{ vars.releaseName }}
        metrics-provider: 'datadog'
        workitem-url: 'https://github.com/${{github.repository}}/issues/'
