@@ -117,7 +117,7 @@ jobs:
         metrics-provider: 'datadog'
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-        SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+        SB_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  ${{ matrix.environment }})] }}
         gh-token: ${{ secrets.GHA_TOKEN }}
       
   release-to-orgs:
