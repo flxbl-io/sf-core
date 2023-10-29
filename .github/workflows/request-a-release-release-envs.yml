@@ -107,7 +107,7 @@ jobs:
         environment: ${{ matrix.environment }}
         branchname: releasedefns
         overrideSkipIfAlreadyInstalled: ${{ needs.issue-analyzer.outputs.forceInstall}}
-        overridePackageVersions: format('{0}_SFDX_AUTH_URL', matrix.environment)
+        overridePackageVersions: ${{ format('{0}_SFDX_AUTH_URL', matrix.environment) }}
 #        overridePackageVersions: ${{ needs.issue-analyzer.outputs.overridePackageVersions }}
         excludePackages: ${{ needs.issue-analyzer.outputs.excludePackages }}
         issue-number: ${{github.event.issue.number}}
