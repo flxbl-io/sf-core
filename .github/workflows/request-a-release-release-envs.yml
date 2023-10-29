@@ -107,8 +107,7 @@ jobs:
         environment: ${{ matrix.environment }}
         branchname: releasedefns
         overrideSkipIfAlreadyInstalled: ${{ needs.issue-analyzer.outputs.forceInstall}}
-        overridePackageVersions: ${{ format('{0}_SFDX_AUTH_URL', matrix.environment) }}
-#        overridePackageVersions: ${{ needs.issue-analyzer.outputs.overridePackageVersions }}
+        overridePackageVersions: ${{ needs.issue-analyzer.outputs.overridePackageVersions }}
         excludePackages: ${{ needs.issue-analyzer.outputs.excludePackages }}
         issue-number: ${{github.event.issue.number}}
         releaselogbranch: releaselogs
@@ -118,7 +117,7 @@ jobs:
         metrics-provider: 'datadog'
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-        SB_SFDX_AUTH_URL:  ${{ secrets.SB_SFDX_AUTH_URL }}
+        SB_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
         gh-token: ${{ secrets.GHA_TOKEN }}
       
   release-to-orgs:
