@@ -116,8 +116,8 @@ jobs:
         workitem-url: https://wingategroup.atlassian.net/browse
         metrics-provider: 'datadog'
     secrets:
-        DEVHUB_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
-        SB_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
+        DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+        ENV_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
         gh-token: ${{ secrets.GHA_TOKEN }}
       
   release-to-orgs:
