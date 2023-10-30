@@ -1,7 +1,7 @@
 name: IssueOps - Fetch Scratch Org From Pool
 on:
   issues:
-    types: [ opened ]
+    types: [ opened, reopened ]
 
 
 
@@ -65,7 +65,7 @@ jobs:
           if [ "$daysToKeep" -gt 15 ]; then
               daysToKeep=15
           fi
-          echo "email=${{ steps.issue-parser.outputs.issueparser_tag }}" >> "$GITHUB_OUTPUT"
+          echo "tag=${{ steps.issue-parser.outputs.issueparser_tag }}" >> "$GITHUB_OUTPUT"
           echo "daysToKeep=$daysToKeep" >> "$GITHUB_OUTPUT"
           echo "email=${{ steps.issue-parser.outputs.issueparser_email }}" >> "$GITHUB_OUTPUT"
         
@@ -92,6 +92,7 @@ jobs:
            devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
            tag: ${{ needs.issue-analyzer.outputs.tag }}
            daysToKeep: ${{ needs.issue-analyzer.outputs.daysToKeep }}
+           gh_token:  ${{ secrets.GHA_TOKEN }}
 
         - name: Create comment after successfull fetching of scratch org
           uses: peter-evans/create-or-update-comment@v3
