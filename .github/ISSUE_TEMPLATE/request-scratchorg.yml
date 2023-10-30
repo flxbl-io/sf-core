@@ -1,0 +1,28 @@
+name: Request a new scratch org from pool
+description: This issue allows a developer to request a new scratch org  for a defined duration
+title: "Ops - Request a new scratch org from pool"
+labels: ["ops"]
+body:
+  - type: input
+    id: tag
+    attributes:
+      label:  The pool from which the scratch org should be fetched
+      description: Please provide the pool name or tag from which the scratch org should be fetched from
+    validations:
+      required: true
+  - type: input
+    id: daysToKeep
+    attributes:
+      label: How long should the sandbox be kept?
+      description: Please provide the number of days to keep the scratchorg, After which the scratchorg will be deleted, Any value more than what is mentioned in the pool configuration will be deleted
+      placeholder: "10"
+    validations:
+      required: true
+  - type: input
+    id: email
+    attributes:
+      label:  Email of the user to which this sandbox should be assigned
+      description: Please provide an email id for the user to which this sandbox should be assigned, A random user with System Adminstrator profile will be created  and assigned this email
+    validations:
+      required: true
+
