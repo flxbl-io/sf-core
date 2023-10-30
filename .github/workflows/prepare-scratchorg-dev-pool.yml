@@ -9,7 +9,7 @@
 
 # This pipeline creates the DEV pools
 
-name: 'Replenish DEV Pools - Auto Triggered'
+name: 'Job - Replenish DEV Pools'
 
 on:
   workflow_dispatch:
