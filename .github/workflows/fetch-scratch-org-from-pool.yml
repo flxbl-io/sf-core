@@ -1,0 +1,129 @@
+name: IssueOps - Fetch Scratch Org From Pool
+on:
+  issues:
+    types: [ opened ]
+
+
+
+run-name: Fetch Scratch Org -issue-${{ github.event.issue.number }}-for-${{ github.event.issue.user.login }}
+
+jobs:
+  issue-analyzer:
+    if: contains(github.event.issue.title, 'Ops - Request a new scratch org from pool')
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.issue-analyzer-output.outputs.tag }}
+      daysToKeep: ${{ steps.issue-analyzer-output.outputs.daysToKeep }}
+      email: ${{ steps.issue-analyzer-output.outputs.email }} 
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/request-scratchorg.yml  
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GHA_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [ "ops","ops-scratchorg-request"]
+            })
+
+
+      - name: Create Comment before initiating action
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+
+            Thanks for requesting a new scratch org to be fetched from pool ${{inputs.tag}}. 
+            We will start the process of fetching the scratch org if available and you will get an email notification once it is ready.
+            If you want to delete this sandbox, please close the issue or wait till the scratchorg expires in ${{ steps.issue-parser.outputs.issueparser_daysToKeep }}
+            days.
+
+            Please check the logs at https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+
+
+      - name: Set Output
+        id: issue-analyzer-output
+        run: |
+          daysToKeep=${{ steps.issue-parser.outputs.issueparser_daysToKeep }}
+          
+          #TODO: Read config and set it back to default
+          # Check if daysToKeep is greater than 15, if yes assign it back to 15
+          if [ "$daysToKeep" -gt 15 ]; then
+              daysToKeep=15
+          fi
+          echo "email=${{ steps.issue-parser.outputs.issueparser_tag }}" >> "$GITHUB_OUTPUT"
+          echo "daysToKeep=$daysToKeep" >> "$GITHUB_OUTPUT"
+          echo "email=${{ steps.issue-parser.outputs.issueparser_email }}" >> "$GITHUB_OUTPUT"
+        
+  execute_action:
+    needs: issue-analyzer
+    runs-on: ubuntu-latest
+    container: ghcr.io/flxbl-io/sfops:lates
+    steps:
+        - uses: actions/checkout@v3
+  
+        - uses: actions/setup-node@v3
+          with:
+            node-version: '18'
+  
+        - name: 'Authenticate DevHub'
+          run: |
+              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
+              sfdx auth:sfdxurl:store -f authfile -a devhub
+        
+        - uses: flxbl-io/sfops-gh-actions/fetchScratchOrgFromPool
+          id: sandbox-creator
+          with:
+           email: ${{ needs.issue-analyzer.outputs.email }}
+           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+           tag: ${{ needs.issue-analyzer.outputs.tag }}
+           daysToKeep: ${{ needs.issue-analyzer.outputs.daysToKeep }}
+
+        - name: Create comment after successfull fetching of scratch org
+          uses: peter-evans/create-or-update-comment@v3
+          with:
+            issue-number: ${{github.event.issue.number}}
+            token: ${{ secrets.GHA_TOKEN }}
+            body: |
+              Hello @${{ github.event.issue.user.login }} :wave:
+              
+              Your sandbox has been created successfully. Please find the details below:
+              - ScratchOrg Username: ${{ steps.sandbox-creator.outputs.SO_USERNAME }}
+              - Assigned UserName: ${{ steps.sandbox-creator.outputs.ASSIGNED_USERNAME }}
+              - Expiry In:  ${{ needs.issue-analyzer.outputs.daysToKeep }} days
+
+              Please check your email for details, on how to reset your password and get access to this org.
+              Please note this scratch org would get automatically deleted when the number of days mentioned above expires.
+      
+  
+  comment_issue_on_error:
+      runs-on: ubuntu-latest
+      needs:   execute_action
+      if: always() && needs.execute_action.result == 'failure'
+      steps:
+
+      - name: Create Comment after failure
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{github.event.issue.number}}
+          token: ${{ secrets.GHA_TOKEN }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+            
+            Apologies, it seems we ran into an issue, This would need your manual attention please check the job run
+            at the link https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+
