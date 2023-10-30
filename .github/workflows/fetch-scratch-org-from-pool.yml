@@ -72,7 +72,7 @@ jobs:
   execute_action:
     needs: issue-analyzer
     runs-on: ubuntu-latest
-    container: ghcr.io/flxbl-io/sfops:lates
+    container: ghcr.io/flxbl-io/sfops:latest
     steps:
         - uses: actions/checkout@v3
   
@@ -85,7 +85,7 @@ jobs:
               echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
               sfdx auth:sfdxurl:store -f authfile -a devhub
         
-        - uses: flxbl-io/sfops-gh-actions/fetchScratchOrgFromPool
+        - uses: flxbl-io/sfops-gh-actions/fetchScratchOrgFromPool@main
           id: sandbox-creator
           with:
            email: ${{ needs.issue-analyzer.outputs.email }}
