@@ -49,7 +49,7 @@ jobs:
 
             Thanks for requesting a new scratch org to be fetched from pool ${{inputs.tag}}. 
             We will start the process of fetching the scratch org if available and you will get an email notification once it is ready.
-            If you want to delete this sandbox, please close the issue or wait till the scratchorg expires in ${{ steps.issue-parser.outputs.issueparser_daysToKeep }}
+            If you want to delete this scratch org, please close the issue or wait till the scratchorg expires in ${{ steps.issue-parser.outputs.issueparser_daysToKeep }}
             days.
 
             Please check the logs at https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
@@ -86,7 +86,7 @@ jobs:
               sfdx auth:sfdxurl:store -f authfile -a devhub
         
         - uses: flxbl-io/sfops-gh-actions/fetchScratchOrgFromPool@main
-          id: sandbox-creator
+          id: scratch-org-fetcher
           with:
            email: ${{ needs.issue-analyzer.outputs.email }}
            devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
@@ -102,9 +102,9 @@ jobs:
             body: |
               Hello @${{ github.event.issue.user.login }} :wave:
               
-              Your sandbox has been created successfully. Please find the details below:
-              - ScratchOrg Username: ${{ steps.sandbox-creator.outputs.SO_USERNAME }}
-              - Assigned UserName: ${{ steps.sandbox-creator.outputs.ASSIGNED_USERNAME }}
+              Your scratch org has been created successfully. Please find the details below:
+              - ScratchOrg Username: ${{ steps.scratch-org-fetcher.outputs.SO_USERNAME }}
+              - Assigned UserName: ${{ steps.scratch-org-fetcher.outputs.ASSIGNED_USERNAME }}
               - Expiry In:  ${{ needs.issue-analyzer.outputs.daysToKeep }} days
 
               Please check your email for details, on how to reset your password and get access to this org.
