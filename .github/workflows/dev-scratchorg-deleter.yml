@@ -1,0 +1,59 @@
+name: IssueOps - Delete Dev Scratch orgs
+
+on:
+  issues:
+    types: [ closed ]
+
+
+
+run-name: Delete scratch org for issue-${{ github.event.issue.number }}
+
+jobs:
+  delete-dev-sandbox:
+    if: contains(github.event.issue.title, 'Ops - Request a new Dev Sandbox')
+    runs-on: ubuntu-latest
+    container: ghcr.io/flxbl-io/sfops:latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Find Comment with Sandbox Name
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body-includes: "ScratchOrg Username:"
+          direction: last
+          token: ${{ secrets.GHA_TOKEN }}
+
+
+      - name: Parse scratchorg information
+        id: parse_so_info
+        run: |
+         comment=$( cat << 'EOF'
+         ${{ steps.fc.outputs.comment-body }} 
+         EOF
+         )
+         if [[ $comment == *"Your sandbox has been fetched successfully"* ]]; then
+          so_username=$(echo "$comment" | sed -n -e 's/^.* ScratchOrg Username: \(.*\)$/\1/p')
+          echo "SO_USERNAME=$so_username" >> "$GITHUB_OUTPUT"
+         else
+          exit 1
+         fi
+
+      - name: 'Authenticate DevHub'
+        run: |
+              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
+              sf auth:sfdxurl:store -f authfile -a devhub
+        
+      - name: Delete Scratch Org
+        continue-on-error: true
+        run: |
+          echo "Deleting scratch org ${{ steps.parse_so_info.outputs.SO_USERNAME }}"
+          sfp pool:org:delete -u ${{ steps.parse_so_info.outputs.SO_USERNAME }} -v devhub 
+
+          
