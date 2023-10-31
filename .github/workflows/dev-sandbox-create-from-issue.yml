@@ -78,7 +78,7 @@ jobs:
   execute_action:
     needs: issue-analyzer
     runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    container: ghcr.io/flxbl-io/sfops:latest
     steps:
         - uses: actions/checkout@v3
   
