@@ -1,0 +1,12 @@
+{
+    "$schema": "https://raw.githubusercontent.com/dxatscale/sfpowerscripts/main/packages/core/resources/pooldefinition.schema.json",
+    "tag": "ci",
+     "maxAllocation": 5,
+     "expiry": 5,
+     "batchSize": 10,
+     "configFilePath": "config/project-scratch-def.json",
+     "relaxAllIPRanges": true,
+     "waitTime": 10
+   }
+  
+  
