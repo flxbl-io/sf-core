@@ -10,7 +10,7 @@ run-name: Delete scratch org for issue-${{ github.event.issue.number }}
 
 jobs:
   delete-dev-sandbox:
-    if: contains(github.event.issue.title, 'Ops - Request a new Dev Sandbox')
+    if: contains(github.event.issue.title, 'Ops - Request a new scratch org from pool')
     runs-on: ubuntu-latest
     container: ghcr.io/flxbl-io/sfops:latest
     steps:
