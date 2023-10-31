@@ -102,7 +102,7 @@ jobs:
             body: |
               Hello @${{ github.event.issue.user.login }} :wave:
               
-              Your scratch org has been created successfully. Please find the details below:
+              Your scratch org has been fetched successfully. Please find the details below:
               - ScratchOrg Username: ${{ steps.scratch-org-fetcher.outputs.SO_USERNAME }}
               - Assigned UserName: ${{ steps.scratch-org-fetcher.outputs.ASSIGNED_USERNAME }}
               - Expiry In:  ${{ needs.issue-analyzer.outputs.daysToKeep }} days

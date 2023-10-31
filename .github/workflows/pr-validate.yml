@@ -174,8 +174,10 @@ jobs:
         name: Print Validation Breakdown
         if: always()
         with:
-          allow-repeats: true
+          allow-repeats: false
           repo-token: ${{ secrets.GHA_TOKEN}}
+          message-id: ${{matrix.filePath}}
+          refresh-message-position: true
           message-path: |
              message.md 
             
