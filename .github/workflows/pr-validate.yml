@@ -129,7 +129,7 @@ jobs:
       - name: 'Validate Against ci scratch org'
         if: steps.getTypeOfPool.outputs.type == 'scratchorg'
         run: |
-          sfp orchestrator:validate -p ${{steps.getTypeOfPool.outputs.pool }} -v devhub --diffcheck  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+          sfp orchestrator:validate -p ${{steps.getTypeOfPool.outputs.pool }} -v devhub   --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
 
