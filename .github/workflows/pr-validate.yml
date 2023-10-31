@@ -60,7 +60,7 @@ jobs:
  validate:
     name: 'Validate Changed Packages'
     runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    container: ghcr.io/flxbl-io/sfops:latest
     if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
     needs: analyze
     strategy:
@@ -114,8 +114,8 @@ jobs:
       - name: 'Authenticate ci for hotfix'
         if: contains(github.base_ref,'release') || github.base_ref == 'refs/heads/release/**'
         run: |
-           sfdx org resume sandbox -n ${{ steps.fetchCISandboxHotfix.outputs.sbxname }} -o devhub
-           sfdx alias set ci=${{ vars.DEVHUB_USERNAME }}.${{ steps.fetchCISandboxHotfix.outputs.sbxname }}
+           sf org resume sandbox -n ${{ steps.fetchCISandboxHotfix.outputs.sbxname }} -o devhub
+           sf alias set ci=${{ vars.DEVHUB_USERNAME }}.${{ steps.fetchCISandboxHotfix.outputs.sbxname }}
 
 
       # Validate source and trigger test
@@ -129,7 +129,7 @@ jobs:
       - name: 'Validate Against ci scratch org'
         if: steps.getTypeOfPool.outputs.type == 'scratchorg'
         run: |
-          sfp orchestrator:validateAgainstOrg -p ${{steps.getTypeOfPool.outputs.pool }} -v devhub --diffcheck  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo -x
+          sfp orchestrator:validate -p ${{steps.getTypeOfPool.outputs.pool }} -v devhub --diffcheck  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
 
