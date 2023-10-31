@@ -75,28 +75,38 @@ jobs:
         run: |
             echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
             sfdx auth:sfdxurl:store -f authfile -a devhub
+
+      - name: 'Fetch Type of Pool'
+        if: github.base_ref == 'main'
+        uses:  flxbl-io/sfops-gh-actions/getTypeOfPool@main
+        id: getTypeOfPool
+        with:
+          pool: ${{ matrix.pool }}
+          directory: config
   
       # Fetch a sandbox
       - name: 'Fetch CI Sandboxes'
-        if: github.base_ref == 'main'
+        if: github.base_ref == 'main' && steps.getTypeOfPool.outputs.type == 'sandbox'
         uses: flxbl-io/sfops-gh-actions/fetchCISandbox@main
         id: fetchCISandbox
         with:
-          domain: ${{ matrix.domainNameUsedForPools }}
+          pool: ${{ matrix.pool }}
           gh_token: ${{ secrets.GHA_TOKEN }}
+
+
 
       - name: 'Fetch CI Sandboxes for hotfixes'
         if:  contains(github.base_ref,'release') || github.base_ref == 'refs/heads/release/**'
         uses:  flxbl-io/sfops-gh-actions/fetchCISandbox@main
         id: fetchCISandboxHotfix
         with:
-          domain: ${{ matrix.domainNameUsedForPools }}
+          pool: HOTFIX
           gh_token: ${{ secrets.GHA_TOKEN }}
 
 
 
       - name: 'Authenticate ci'
-        if: github.base_ref == 'main'
+        if: github.base_ref == 'main' && steps.getTypeOfPool.outputs.type == 'sandbox'
         run: |
            sfdx org resume sandbox -n ${{ steps.fetchCISandbox.outputs.sbxname }} -o devhub
            sfdx alias set ci=${{ vars.DEVHUB_USERNAME }}.${{ steps.fetchCISandbox.outputs.sbxname }}
@@ -109,20 +119,19 @@ jobs:
 
 
       # Validate source and trigger test
-      - name: 'Validate Against ci'
+      - name: 'Validate Against ci sandbox'
+        if: steps.getTypeOfPool.outputs.type == 'sandbox'
         run: |
-          sfpowerscripts orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
+          sfp orchestrator:validateAgainstOrg -u ci -v devhub --diffcheck --disableartifactupdate  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo
 
 
-      - name: Publish Test Report
-        uses: dorny/test-reporter@v1
-        continue-on-error: true
-        if: success() || failure() # always run even if the previous step fails
-        with:
-          name: Apex Test Reports
-          path: '.testResults/*.xml'
-          reporter: 'java-junit'
-          token: ${{ secrets.GHA_TOKEN }}
+      # Validate source and trigger test
+      - name: 'Validate Against ci scratch org'
+        if: steps.getTypeOfPool.outputs.type == 'scratchorg'
+        run: |
+          sfp orchestrator:validateAgainstOrg -p ${{steps.getTypeOfPool.outputs.pool }} -v devhub --diffcheck  --disablesourcepkgoverride  --installdeps   --mode=thorough-release-config --releaseconfig=${{matrix.filePath}} --orginfo -x
+
+
 
       - name: Create Message Body as File
         id: message_template
@@ -188,9 +197,9 @@ jobs:
       # Fetch a sandbox
       - name: 'Release CI Sandboxes'
         uses:  flxbl-io/sfops-gh-actions/releaseCISandbox@main
-        if: always()
+        if: always() && steps.getTypeOfPool.outputs.type == 'sandbox'
         with:
-          domain: ${{ matrix.domainNameUsedForPools }}
+          domain: ${{ matrix.pool }}
           sbxname: ${{ steps.fetchCISandbox.outputs.sbxname }}
           gh_token: ${{ secrets.GHA_TOKEN }}
 
