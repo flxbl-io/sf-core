@@ -38,7 +38,7 @@ jobs:
          ${{ steps.fc.outputs.comment-body }} 
          EOF
          )
-         if [[ $comment == *"Your sandbox has been fetched successfully"* ]]; then
+         if [[ $comment == *"Your scratch org has been fetched successfully"* ]]; then
           so_username=$(echo "$comment" | sed -n -e 's/^.* ScratchOrg Username: \(.*\)$/\1/p')
           echo "SO_USERNAME=$so_username" >> "$GITHUB_OUTPUT"
          else
