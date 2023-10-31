@@ -28,7 +28,7 @@ jobs:
 
             // Here we parse the issue body to get the DAYS_TO_KEEP value
             const lines = issue.body.split("\n");
-            const questionIndex = lines.findIndex(line => line.includes("How long should the scratch org  be kept?"));
+            const questionIndex = lines.findIndex(line => line.includes("How long should the scratch org be kept?"));
             if (questionIndex !== -1 && lines.length > questionIndex + 2) {
             let DAYS_TO_KEEP = 10;
               try
