@@ -1,11 +1,11 @@
 [
   {
-    "domain": "CORE",
+    "pool": "CORE",
     "count": 2,
     "sourceSB": "MASTERDEV"
   },
   {
-    "domain": "HOTFIX",
+    "pool": "HOTFIX",
     "count": 1,
     "sourceSB": "production"
   }
