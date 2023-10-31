@@ -11,7 +11,7 @@
 # This pipeline creates the CI pools used during validate
 
 
-name: 'Replenish CI Pools - Auto Triggered'
+name: 'Job - Replenish CI Pools (ScratchOrg)'
 
 on:
   workflow_dispatch:
