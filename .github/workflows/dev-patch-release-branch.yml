@@ -64,7 +64,7 @@ jobs:
 
   execute_action:
     runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    container: ghcr.io/flxbl-io/sfops:latest
     concurrency: patch
     needs: issue-analyzer
     steps:

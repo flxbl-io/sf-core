@@ -12,7 +12,7 @@ jobs:
   delete-dev-sandbox:
     if: contains(github.event.issue.title, 'Ops - Request a new Dev Sandbox')
     runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:alpha
+    container: ghcr.io/flxbl-io/sfops:latest
     steps:
 
       - uses: actions/checkout@v3
