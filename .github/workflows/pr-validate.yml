@@ -38,6 +38,7 @@ jobs:
  analyze:
   name: 'Analyze Impacted Domains'
   runs-on: ubuntu-latest
+  container: ghcr.io/flxbl-io/sfops-lite:latest
   outputs:
     matrix: ${{ steps.set-matrix.outputs.matrix }}
   steps:
