@@ -57,7 +57,7 @@ jobs:
       - name: Set matrix data
         id: set-matrix
         run: |
-           echo "matrix=$(jq -c . < ./impacted-releases.json)" >> $GITHUB_OUTPUT
+           echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
   
 
   build-deploy-publish:
