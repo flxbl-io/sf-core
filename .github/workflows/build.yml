@@ -86,6 +86,6 @@ jobs:
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
-      sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+      sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
   
