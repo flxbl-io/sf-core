@@ -21,6 +21,7 @@ env:
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
 permissions: 
+   contents: read
    packages: write
 
 jobs:
