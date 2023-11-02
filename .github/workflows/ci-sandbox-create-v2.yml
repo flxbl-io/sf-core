@@ -32,6 +32,8 @@ jobs:
         with:
           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
           gh_token: ${{ secrets.GHA_TOKEN }}
+          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
+          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
 
@@ -70,6 +72,8 @@ jobs:
           pathToPoolConfigFile: "config/sandbox-pool-config.json"
           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
           gh_token: ${{ secrets.GHA_TOKEN }}
+          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
+          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
 
