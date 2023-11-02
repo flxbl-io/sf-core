@@ -26,14 +26,20 @@ jobs:
               echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
               sfdx auth:sfdxurl:store -f authfile -a devhub
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
       #Create a sandbox
       - name: 'Delete CI Sandboxes'
         uses:  flxbl-io/sfops-gh-actions/deleteCISandboxes@main
         with:
           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          gh_token: ${{ secrets.GHA_TOKEN }}
-          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
-          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+          gh_token: ${{ steps.app-token.outputs.token }}
+
 
 
 
@@ -48,6 +54,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
             node-version: "18" 
+
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
       - name: Check time and exit if not within time range
@@ -71,9 +84,8 @@ jobs:
         with:
           pathToPoolConfigFile: "config/sandbox-pool-config.json"
           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          gh_token: ${{ secrets.GHA_TOKEN }}
-          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
-          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+          gh_token: ${{ steps.app-token.outputs.token }}
+
 
 
 

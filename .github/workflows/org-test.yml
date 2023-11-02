@@ -23,10 +23,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
       - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
         id: fetchAllEnvs
         with:
-          gh_token: ${{ secrets.GHA_TOKEN }}
+          gh_token: ${{ steps.app-token.outputs.token }}
           filter: "testrun:true"
   
 
@@ -44,6 +51,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
       - name: Authenticate to ${{matrix.environment}}
         id: handle-auth
         uses: flxbl-io/sfops-gh-actions/authToEnvironment@main
@@ -57,7 +70,7 @@ jobs:
         with:
          alias: ${{matrix.environment}}
          target-repo: flxbl-io/sfops-dashboard
-         gh_token: ${{ secrets.GHA_TOKEN }}
+         gh_token: ${{ steps.app-token.outputs.token }}
   
  
   static:
@@ -70,6 +83,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
       - name: 'Initialize and Setup' 
@@ -89,5 +108,6 @@ jobs:
          commit-message: 'updated with pmd results'
          target-dir: pmd
          target-repo: flxbl-io/sfops-dashboard
-         gh_token: ${{ secrets.GHA_TOKEN }}
+         sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
+         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
 
