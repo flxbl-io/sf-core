@@ -49,6 +49,8 @@ jobs:
           usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
           gh_token: ${{ secrets.GHA_TOKEN }}
           pathToPoolConfigFile: "config/sandbox-pool-config.json"
+          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
+          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
 
