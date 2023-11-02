@@ -29,6 +29,13 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
           
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
       - uses: pmd/pmd-github-action@v1
         with:
           rulesets: 'pmd-rulesets/pmd-ruleset.xml'
