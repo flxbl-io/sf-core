@@ -108,6 +108,6 @@ jobs:
          commit-message: 'updated with pmd results'
          target-dir: pmd
          target-repo: flxbl-io/sfops-dashboard
-         sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
+         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
 
