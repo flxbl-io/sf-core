@@ -172,6 +172,7 @@ jobs:
         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}  
         datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
         datadog-host: ${{ secrets.DATADOG_HOST }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   
   close_issue:
      runs-on: ubuntu-latest
