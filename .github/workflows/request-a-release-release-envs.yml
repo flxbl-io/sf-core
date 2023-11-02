@@ -127,10 +127,10 @@ jobs:
         issue-notifier: 'flxbl-io/sf-core'
         workitem-url: https://wingategroup.atlassian.net/browse
         metrics-provider: 'datadog'
+        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         ENV_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
-        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
   
       
@@ -165,10 +165,10 @@ jobs:
         metrics-provider: 'datadog'
         pathToReleaseConfigs: 'config'
         releaseBoard: 'ReleaseBoard'
+        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
-        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}  
         datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
         datadog-host: ${{ secrets.DATADOG_HOST }}

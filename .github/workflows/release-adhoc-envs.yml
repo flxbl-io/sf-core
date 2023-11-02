@@ -79,9 +79,9 @@ jobs:
         issue-number: ${{github.event.issue.number}}
         issue-author: ${{github.event.issue.user.login}}
         issue-notifier: ${{github.event.issue.user.login}}
+        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-        sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
       
   close_issue:
