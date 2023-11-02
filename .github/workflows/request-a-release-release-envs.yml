@@ -131,7 +131,7 @@ jobs:
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         ENV_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
-        sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+        sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
   
       
   release-to-orgs:
@@ -169,7 +169,7 @@ jobs:
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
-        sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}  
+        sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}  
         datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
         datadog-host: ${{ secrets.DATADOG_HOST }}
   

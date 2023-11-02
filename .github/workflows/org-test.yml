@@ -109,5 +109,5 @@ jobs:
          target-dir: pmd
          target-repo: flxbl-io/sfops-dashboard
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 

@@ -49,7 +49,7 @@ jobs:
           usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
           pathToPoolConfigFile: "config/sandbox-pool-config.json"
           sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+          sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
 
 

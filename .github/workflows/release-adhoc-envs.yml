@@ -82,7 +82,7 @@ jobs:
         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-        sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+        sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       
   close_issue:
      runs-on: ubuntu-latest
