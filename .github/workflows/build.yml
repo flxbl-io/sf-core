@@ -20,6 +20,8 @@ env:
   SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
+permissions: 
+   packages: write
 
 jobs:
   analyze:
@@ -87,5 +89,6 @@ jobs:
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
       sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: $${{ secrets.gh_token }}
 
   

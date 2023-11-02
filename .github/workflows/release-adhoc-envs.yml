@@ -11,6 +11,8 @@ env:
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
 
+ 
+
 jobs:
   issue-analyzer:
     if: contains(github.event.issue.title, 'Ops - Request a release into an org')
@@ -81,6 +83,7 @@ jobs:
         issue-notifier: ${{github.event.issue.user.login}}
         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       
