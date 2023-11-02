@@ -25,6 +25,14 @@ jobs:
         with:
           node-version: '18'
 
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
       - uses: stefanbuck/github-issue-parser@v3
         id: issue-parser
         with:
@@ -32,7 +40,7 @@ jobs:
 
       - uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GHA_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
@@ -45,7 +53,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{github.event.issue.number}}
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           body: |
             Hello @${{ github.event.issue.user.login }} :wave:
             
@@ -78,6 +86,14 @@ jobs:
          registry-url: 'https://npm.pkg.github.com'
 
 
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
       # Release to environment
       - name: 'Patch Release Branch'
         run: |
@@ -97,7 +113,7 @@ jobs:
             git show origin/releasedefns:${{ needs.issue-analyzer.outputs.domain }}/$pathToReleaseDef.yml > $pathToReleaseDef.yml
             sfpowerscripts repo:patch -p  $pathToReleaseDef.yml -s main  -t release/${{ needs.issue-analyzer.outputs.domain }} --npm --scope ${{ github.repository_owner }} 
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}         
+         NODE_AUTH_TOKEN: ${{ steps.app-token.outputs.token }}         
       
   close_issue:
      runs-on: ubuntu-latest
@@ -107,11 +123,19 @@ jobs:
       # gh needs a repo bummer
       - uses: actions/checkout@v3
 
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
       - name: Close Issue
         run: |
          gh issue close ${{github.event.issue.number}} -c " Hello @${{ github.event.issue.user.login }} :wave: \n Your request has been sucessfully processed" -r "Completed"
         env:
-           GH_TOKEN: ${{ secrets.GHA_TOKEN }}
+           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
   comment_issue_on_error:
       runs-on: ubuntu-latest
@@ -119,11 +143,21 @@ jobs:
       if: always() && needs.execute_action.result == 'failure'
       steps:
 
+
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
+
       - name: Create Comment after failure
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{github.event.issue.number}}
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           body: |
             Hello @${{ github.event.issue.user.login }} :wave:
             

@@ -33,7 +33,7 @@ jobs:
         with:
           rulesets: 'pmd-rulesets/pmd-ruleset.xml'
           analyzeModifiedFilesOnly: true
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
  
  analyze:
   name: 'Analyze Impacted Domains'
@@ -71,6 +71,13 @@ jobs:
         with:
           fetch-depth: 0
 
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
       - name: 'Authenticate DevHub'
         run: |
             echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
@@ -91,7 +98,7 @@ jobs:
         id: fetchCISandbox
         with:
           pool: ${{ matrix.pool }}
-          gh_token: ${{ secrets.GHA_TOKEN }}
+          gh_token: ${{ steps.app-token.outputs.token }}
 
 
 
@@ -101,7 +108,7 @@ jobs:
         id: fetchCISandboxHotfix
         with:
           pool: HOTFIX
-          gh_token: ${{ secrets.GHA_TOKEN }}
+          gh_token: ${{ steps.app-token.outputs.token }}
 
 
 
@@ -174,8 +181,10 @@ jobs:
         name: Print Validation Breakdown
         if: always()
         with:
-          allow-repeats: true
+          allow-repeats: false
           repo-token: ${{ secrets.GHA_TOKEN}}
+          message-id: ${{matrix.filePath}}
+          refresh-message-position: true
           message-path: |
              message.md 
             
@@ -201,7 +210,7 @@ jobs:
         with:
           domain: ${{ matrix.pool }}
           sbxname: ${{ steps.fetchCISandbox.outputs.sbxname }}
-          gh_token: ${{ secrets.GHA_TOKEN }}
+          gh_token: ${{ steps.app-token.outputs.token }}
 
 
  results:

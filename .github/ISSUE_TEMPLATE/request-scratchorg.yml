@@ -13,7 +13,7 @@ body:
   - type: input
     id: daysToKeep
     attributes:
-      label: How long should the scratch org  be kept?
+      label: How long should the scratch org be kept?
       description: Please provide the number of days to keep the scratchorg, After which the scratchorg will be deleted, Any value more than what is mentioned in the pool configuration will be deleted
       placeholder: "10"
     validations:
