@@ -40,6 +40,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
       - name: 'Authenticate Dev Hub'
         run: |
           echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
@@ -48,7 +54,7 @@ jobs:
       - name: 'Create packages'
         id: sfpowerscripts-build
         run: |
-          sfp orchestrator:quickbuild -v devhub --diffcheck --branch ${GITHUB_REF#refs/heads/} --buildnumber ${GITHUB_RUN_ID}
+          sfp orchestrator:quickbuild -v devhub  --branch ${GITHUB_REF#refs/heads/} --buildnumber ${GITHUB_RUN_ID}
 
       # Publish artifacts
       - uses: actions/upload-artifact@v2
@@ -66,4 +72,4 @@ jobs:
         run: |
           sfp orchestrator:publish -d artifacts --npm --scope @${{ github.repository_owner }}  --gittag --pushgittag
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
+         NODE_AUTH_TOKEN: ${{ steps.app-token.outputs.token }}
