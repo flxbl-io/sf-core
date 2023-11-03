@@ -35,7 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/dxatscale/sfpowerscripts
     concurrency: build
-    if: contains(github.ref,'release') || github.ref == 'refs/heads/release/**'
     steps:
       - uses: actions/checkout@v2
         with:
