@@ -45,6 +45,7 @@ jobs:
         with:
          app-id: ${{ vars.SFOPSBOT_APP_ID }}
          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+         owner: ${{ github.repository_owner }}
 
       - name: 'Authenticate Dev Hub'
         run: |
