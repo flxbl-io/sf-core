@@ -80,13 +80,13 @@ jobs:
        metrics-provider: 'datadog'
        workitem-url: 'https://github.com/${{github.repository}}/issues/'
        workitem-filter: '(ISSUE)-[0-9]{3,4}'
-       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+#      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
-      sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+#      sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       gh_token: $${{ secrets.GHA_TOKEN }}
 
   
