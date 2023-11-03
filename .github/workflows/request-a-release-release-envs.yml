@@ -26,10 +26,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -129,6 +125,7 @@ jobs:
         metrics-provider: 'datadog'
         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
+        NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         ENV_SFDX_AUTH_URL: ${{ secrets[format('{0}_SFDX_AUTH_URL',  matrix.environment )] }}
         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
@@ -172,7 +169,7 @@ jobs:
         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}  
         datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
         datadog-host: ${{ secrets.DATADOG_HOST }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
   close_issue:
      runs-on: ubuntu-latest
