@@ -87,6 +87,7 @@ jobs:
       datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
       datadog-host: ${{ secrets.DATADOG_HOST }}
       sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: $${{ secrets.GITHUB_TOKEN }}
 
   
