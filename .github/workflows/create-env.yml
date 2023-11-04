@@ -15,7 +15,7 @@ jobs:
    
    analyze-issues:
     name: 'Act on sfops issues'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/issue-analyzer.yml@main
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-create-env.yml@main
     with:
       issue-number: ${{ github.event.issue.number}}
       issue-body: ${{ github.event.issue.body }}
