@@ -1,5 +1,5 @@
-name: 'IssueOps - Create an Environment'
-run-name: 'Create an environment -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+name: 'IssueOps - sfops'
+run-name: '${{ github.event.issue.title }} -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
 on:
   issues:
     types: [ opened, reopened ]
