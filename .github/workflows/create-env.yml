@@ -2,7 +2,7 @@ name: 'IssueOps - Create an Environment'
 run-name: 'Create an environment -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
 on:
   issues:
-    types: [ opened ]
+    types: [ opened, reopened ]
 
 #Set the environment variables for tracking metrics
 env:
