@@ -147,6 +147,25 @@
             ],
             "hashId": "b148ff8c07e77348afe52228b97a4002aae1aff0",
             "date": "Tue Sep 19 2023 07:52:57 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-1-04-11-6752304183"
+            ],
+            "buildNumber": 6,
+            "workItems": {},
+            "artifacts": [
+                {
+                    "name": "unpackaged",
+                    "from": "6addb46e",
+                    "to": "03c9a466",
+                    "version": "1.0.5.6752251421",
+                    "latestCommitId": "ede68574",
+                    "commits": []
+                }
+            ],
+            "hashId": "203e5ad4b2e01edcb730ec69217a5d457bd44b01",
+            "date": "Sat Nov 04 2023 03:01:13 GMT+0000 (Coordinated Universal Time)"
         }
     ]
 }
