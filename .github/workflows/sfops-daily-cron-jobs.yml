@@ -52,39 +52,4 @@ jobs:
         env:
           GH_TOKEN: $${{ steps.app-token.outputs.token }}
 
-    name: 'static-analysis-of-Apex-classes-using-PMD'
-    runs-on: ubuntu-latest
-    container: ghcr.io/flxbl-io/sfops:latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-           app-id: ${{ vars.SFOPSBOT_APP_ID }}
-           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-
-
-      - name: 'Initialize and Setup' 
-        run: |
-            sfdx plugins:install @salesforce/sfdx-scanner
-
-      - name: 'Run sfdx-scanner'  
-        run: |
-            mkdir pmd
-            sfdx scanner:run --target "src"  --pmdconfig "pmd-rulesets/pmd-ruleset.xml" --format "html" -o "pmd/pmdReport.html" 
-            sfdx scanner:run --target "src"  --pmdconfig "pmd-rulesets/pmd-ruleset.xml" --format "csv" -o "pmd/pmdReport-csv.csv" 
-            
-      - name: 'Upload pmd results to sfops-dashboard'
-        uses: flxbl-io/sfops-gh-actions/gitRepoCommitter@main
-        with:
-         source-dir: pmd
-         commit-message: 'updated with pmd results'
-         target-dir: pmd
-         target-repo: flxbl-io/sfops-dashboard
-         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+   
