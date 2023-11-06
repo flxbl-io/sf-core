@@ -1,4 +1,4 @@
-name: 'IssueOps - sfops'
+name: 'sfops - Execute Issue Ops'
 run-name: '${{ github.event.issue.title }}-${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
 on:
   issues:
