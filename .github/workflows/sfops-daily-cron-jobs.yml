@@ -22,7 +22,6 @@ jobs:
   gh-reporter:
     name: 'Report github metrics'
     runs-on: ubuntu-latest
-    container: ghcr.io/flxbl-io/sfops:latest
     steps:
       - uses: actions/checkout@v3
 
