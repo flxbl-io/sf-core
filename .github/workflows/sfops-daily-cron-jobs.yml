@@ -1,9 +1,10 @@
-name: sfops - daily job executer
+name: sfops - Daily job executer
 on:
   schedule:
     - cron: '0 12 * * *' # At 12 00 UTC every day
   workflow_dispatch:
 
+run-name: 'sfops- Execute Daily Jobs'
 
 jobs:
   expire-dev-envs:
