@@ -5,7 +5,7 @@ on:
     types: [ opened , reopened]
 
 
-
+jobs:
  execute-release-issue-release-envs:
     name: 'Act on sfops release issue'
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-release-to-release-envs.yml@main
