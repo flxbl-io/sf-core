@@ -3,17 +3,13 @@ description: This issue allows you to request a new managed/unlocked package ins
 title: "Ops - Install a new managed/unlocked package"
 labels: ["ops","ops-package-installation-request"]
 body:
-  - type: checkboxes
+  - type: input
     id: envs
     attributes:
-      label: Pick an environment where the package should be installed to
-      description: The environment name should match the environments configured in github actions
-      options:
-         - label: qa
-         - label: uat
-         - label: golden_sb
-         - label: staging
-         - label: prod
+      label: Name of the org(s)
+      description: Please provide the name of the org(s), Only orgs that are created by build bot or available in the env can be used
+    validations:
+      required: true
   - type: input
     id: packageId
     attributes:

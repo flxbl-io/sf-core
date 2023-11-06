@@ -1,4 +1,4 @@
-name: 'Jobs - Report results of all tests'
+name: 'Jobs - Report results of all quality tests'
 
 # Read name of sandbox
 on:
@@ -11,6 +11,8 @@ env:
   SFPOWERSCRIPTS_DATADOG: 'true'
   SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
   SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+run-name: 'sfops- Execute Daily Quality Tests'
 
 jobs:
 
@@ -108,6 +110,6 @@ jobs:
          commit-message: 'updated with pmd results'
          target-dir: pmd
          target-repo: flxbl-io/sfops-dashboard
-         sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
-         sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
+         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         sfopsbot-private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 

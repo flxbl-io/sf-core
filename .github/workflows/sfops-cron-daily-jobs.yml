@@ -1,0 +1,39 @@
+name: sfops - Daily job executer
+on:
+  schedule:
+    - cron: '0 12 * * *' # At 12 00 UTC every day
+  workflow_dispatch:
+
+run-name: 'sfops- Execute Daily Jobs'
+
+jobs:
+  expire-dev-envs:
+    name: 'Expire Developer Environments'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/expire-dev-envs.yml@main
+    with:
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+  gh-reporter:
+    name: 'Report github metrics'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+           app-id: ${{ vars.SFOPSBOT_APP_ID }}
+           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
+
+      - name: 'Run github metric reporter'  
+        run: |
+          node scripts/build-scripts/github-pr-status-reporter.js $(date "+%Y-%m-%d")
+        env:
+          GH_TOKEN: $${{ steps.app-token.outputs.token }}

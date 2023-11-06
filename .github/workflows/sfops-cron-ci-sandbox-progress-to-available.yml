@@ -16,26 +16,18 @@ jobs:
   check-ci-sandbox-status:
     runs-on: ubuntu-latest
     continue-on-error: true 
-    container: ghcr.io/dxatscale/sfpowerscripts-rc:main
+    container: ghcr.io/flxbl-io/sfops:latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - uses: actions/create-github-app-token@v1
+        id: app-token
         with:
-            node-version: "18" 
+         app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
-
-      - name: Check time and exit if not within time range
-        run: |
-          # Get current hour in AEST
-          HOUR=$(TZ="Australia/Melbourne" date +"%H")
-          echo CurrentTime:$HOUR
-          if (( HOUR < 8 || HOUR > 23 )); then
-            echo "Outside of 8 AM - 11 PM AEST, exiting"
-            exit 1
-          fi
-
+         
       - name: 'Authenticate DevHub'
         run: |
               echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
@@ -48,8 +40,6 @@ jobs:
           devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
           usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
           pathToPoolConfigFile: "config/sandbox-pool-config.json"
-          sfopsbot-app-id: ${{ vars.SFOPBSBOT_APP_ID }}
-          sfopsbot-private-key: ${{ vars.SFOPSBOT_APP_PRIVATE_KEY }}
-
+          gh_token:  ${{ steps.app-token.outputs.token }}
 
 

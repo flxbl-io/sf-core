@@ -1,0 +1,44 @@
+name: 'sfops -  Execute Releases'
+run-name: 'Release a domain To Envs -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+on:
+  issues:
+    types: [ opened , reopened]
+
+
+jobs:
+ execute-release-issue-release-envs:
+    name: 'Act on sfops release issue'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-release-to-release-envs.yml@main
+    with:
+      issue-number: ${{ github.event.issue.number}}
+      issue-body: ${{ github.event.issue.body }}
+      issue-title:  ${{ github.event.issue.title }} 
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+      source-repo-url: https://github.com/flxbl-io/sf-core
+      workitem-url: https://github.com/flxbl-io/sf-core/issues
+      metrics-provider: 'datadog'
+      issue-notifier: 'flxbl-io/sf-core'
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+
+ execute-release-issue-any-envs:
+    name: 'Act on sfops release issue'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-release-to-any-env.yml@main
+    with:
+      issue-number: ${{ github.event.issue.number}}
+      issue-body: ${{ github.event.issue.body }}
+      issue-title:  ${{ github.event.issue.title }} 
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    

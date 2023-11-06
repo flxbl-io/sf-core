@@ -1,0 +1,24 @@
+name: 'PR - Validate'
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+ validate-changes:
+    name: 'Validate changes raised in a PR'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/pr-validate.yml@main
+    with:
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+      metrics-provider: 'datadog'
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    

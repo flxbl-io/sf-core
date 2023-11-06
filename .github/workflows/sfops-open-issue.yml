@@ -1,0 +1,30 @@
+name: 'sfops - Execute Issue Ops'
+run-name: '${{ github.event.issue.title }}-${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+on:
+  issues:
+    types: [ opened, reopened ]
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+      
+ analyze-issues:
+    name: 'Act on sfops issues'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/issue-analyzer.yml@main
+    with:
+      issue-number: ${{ github.event.issue.number}}
+      issue-body: ${{ github.event.issue.body }}
+      issue-title:  ${{ github.event.issue.title }} 
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    

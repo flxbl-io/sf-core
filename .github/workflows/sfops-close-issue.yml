@@ -1,0 +1,43 @@
+name: sfops - Close Issues
+
+on:
+  issues:
+    types: [ closed ]
+
+
+
+run-name: sfops - Close Issue-${{ github.event.issue.number }}
+
+jobs:
+ delete-envs:
+    name: 'Delete Environments'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/delete-envs.yml@main
+    with:
+      issue-number: ${{ github.event.issue.number}}
+      issue-body: ${{ github.event.issue.body }}
+      issue-title:  ${{ github.event.issue.title }} 
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+
+ close-pending-action-issues:
+    name: 'Close Pending Action On Issues'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/close-pending-action-on-issues.yml@main
+    with:
+      issue-number: ${{ github.event.issue.number}}
+      issue-body: ${{ github.event.issue.body }}
+      issue-title:  ${{ github.event.issue.title }} 
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    

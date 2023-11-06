@@ -18,7 +18,7 @@ jobs:
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           jira-token: ${{ secrets.JIRA_TOKEN }}
-          jira-base-url: https://wingategroup.atlassian.net
+          jira-base-url: https://github.com/flxbl-io/sf-core/issues
           skip-branches: '^(release|release\/v\d+)$'
           skip-comments: true
           pr-threshold: 1000
