@@ -3,7 +3,7 @@ description: This issue allows you to request a new managed/unlocked package ins
 title: "Ops - Install a new managed/unlocked package"
 labels: ["ops","ops-package-installation-request"]
 body:
-  - type: checkboxes
+  - type: input
     id: envs
     attributes:
       label: Name of the org(s)
