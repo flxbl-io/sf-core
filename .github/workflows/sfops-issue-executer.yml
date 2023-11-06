@@ -14,7 +14,6 @@ env:
 jobs:
    
  debug-issue:
-    if: contains(github.event.issue.title, 'Ops - Test Deletion of a component')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
