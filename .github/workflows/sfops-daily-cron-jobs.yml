@@ -8,7 +8,7 @@ on:
 jobs:
   expire-dev-envs:
     name: 'Expire Developer Environments'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/expire-dev-envs@main
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/expire-dev-envs.yml@main
     with:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
