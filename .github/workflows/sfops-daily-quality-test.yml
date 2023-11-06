@@ -1,4 +1,4 @@
-name: 'Jobs - Report results of all tests'
+name: 'Jobs - Report results of all quality tests'
 
 # Read name of sandbox
 on:

@@ -1,23 +1,22 @@
-name: 'sfops -  Execute Releases'
-run-name: 'Release a domain To Envs -${{ github.event.issue.number }}-requested by-${{ github.event.issue.user.login }}'
+name: sfops - Close Issues
+
 on:
   issues:
-    types: [ opened , reopened]
+    types: [ closed ]
 
+
+
+run-name: sfops - Close Issue-${{ github.event.issue.number }}
 
 jobs:
- execute-release-issue-release-envs:
-    name: 'Act on sfops release issue'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-release-to-release-envs.yml@main
+ delete-envs:
+    name: 'Delete Environments'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/delete-envs.yml@main
     with:
       issue-number: ${{ github.event.issue.number}}
       issue-body: ${{ github.event.issue.body }}
       issue-title:  ${{ github.event.issue.title }} 
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-      source-repo-url: https://github.com/flxbl-io/sf-core
-      workitem-url: https://wingategroup.atlassian.net/browse
-      metrics-provider: 'datadog'
-      issue-notifier: 'flxbl-io/sf-core'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
@@ -27,9 +26,9 @@ jobs:
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 
 
- execute-release-issue-any-envs:
-    name: 'Act on sfops release issue'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-release-to-any-env.yml@main
+ close-pending-action-issues:
+    name: 'Close Pending Action On Issues'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/close-pending-action-on-issues.yml@main
     with:
       issue-number: ${{ github.event.issue.number}}
       issue-body: ${{ github.event.issue.body }}
