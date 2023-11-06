@@ -1,13 +1,25 @@
-name: Request a DX@Scale package installation
-description: This issue allows you to request a new managed/unlocked package installation to a target org
-title: "Ops - Install a new managed/unlocked package"
-labels: ["ops", "ops-package-installation-request"]
+name: Request a sfp artifact installation
+description: This issue allows to install a sfp artifact to a target org
+title: "Ops - Install an sfp artifact to an org(s)"
+labels: ["ops", "ops-sfp-artifact-installation-request"]
 body:
-  - type: input
-    id: orgname
+  - type: markdown
     attributes:
-      label: Name of the org
-      description: Please provide the name of the org, Only orgs created by build bot can be used, If you want to create a new org, please raise an issue first
+      value: |
+        ## Instructions!
+
+        This issue template is used to install an artifact into an org that is created by buildbot 
+        or an org that is registred in Github Environments
+
+        ## :warning: Warnings!
+        - Please use this issue sparingly and try to use release candidates whenever possible
+        - Use this  issue to deploy technical artifacts or artifacts that are indpendent and do not belong to a domain
+
+  - type: input
+    id: orgnames
+    attributes:
+      label: Name of the org(s)
+      description: Please provide the name of the org(s), Only orgs that are created by build bot or available in the env can be used
     validations:
       required: true
   - type: input
@@ -31,15 +43,15 @@ body:
       description: Please provide the full version of the package as seen in your  Github Packages, such as 1.0.0-232323
     validations:
       required: true
-  - type: dropdown
-    id: installationmode
-    attributes:
-      label: Pick an installation mode if the requested package is unlocked package
-      description: Unlocked package has various installation mopdes, please pick one
-      options:
-        - delete-only
-        - deprecate-only
-        - mixed-mode
+  # - type: dropdown
+  #   id: installationmode
+  #   attributes:
+  #     label: Pick an installation mode if the requested package is unlocked package
+  #     description: Unlocked package has various installation mopdes, please pick one
+  #     options:
+  #       - delete-only
+  #       - deprecate-only
+  #       - mixed-mode
   - type: checkboxes
     id: forceInstall
     attributes:
