@@ -6,14 +6,10 @@ body:
   - type: checkboxes
     id: envs
     attributes:
-      label: Pick an environment where the package should be installed to
-      description: The environment name should match the environments configured in github actions
-      options:
-         - label: qa
-         - label: uat
-         - label: golden_sb
-         - label: staging
-         - label: prod
+      label: Name of the org(s)
+      description: Please provide the name of the org(s), Only orgs that are created by build bot or available in the env can be used
+    validations:
+      required: true
   - type: input
     id: packageId
     attributes:
