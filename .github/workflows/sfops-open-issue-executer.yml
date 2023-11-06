@@ -12,17 +12,7 @@ env:
 
 
 jobs:
-   
- debug-issue:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - run: |
-           echo  ${{ toJSON(github.event.issue) }}
-          
-       
-   
+      
  analyze-issues:
     name: 'Act on sfops issues'
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/issue-analyzer.yml@main
