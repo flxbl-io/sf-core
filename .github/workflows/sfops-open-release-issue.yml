@@ -15,7 +15,7 @@ jobs:
       issue-title:  ${{ github.event.issue.title }} 
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
       source-repo-url: https://github.com/flxbl-io/sf-core
-      workitem-url: https://wingategroup.atlassian.net/browse
+      workitem-url: https://github.com/flxbl-io/sf-core/issues
       metrics-provider: 'datadog'
       issue-notifier: 'flxbl-io/sf-core'
     secrets:

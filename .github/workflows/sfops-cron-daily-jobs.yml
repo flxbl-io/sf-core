@@ -31,20 +31,6 @@ jobs:
            app-id: ${{ vars.SFOPSBOT_APP_ID }}
            private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
 
-      - name: 'Initialize and Setup' 
-        run: |
-              npm install
-              # Setup safe directory as github actions checkout errors out in containers with root user
-              git config --global --add safe.directorGHA_TOKENy /__w/sf-core/sf-core
-
-              # Install ubuntu
-              type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-              curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-              && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-              && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-              && sudo apt update \
-              && sudo apt install gh -y
-
 
       - name: 'Run github metric reporter'  
         run: |

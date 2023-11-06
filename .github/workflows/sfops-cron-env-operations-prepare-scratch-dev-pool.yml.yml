@@ -58,7 +58,7 @@ jobs:
       - name: 'Prepare a pool of scratch orgs'
         run: 'sfp orchestrator:prepare -f config/scratch-dev-pool.json -v devhub'
         env:
-         NODE_AUTH_TOKEN: ${{ secrets.GHA_TOKEN }}
+         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
               # Publish artifacts
       - uses: actions/upload-artifact@v3
