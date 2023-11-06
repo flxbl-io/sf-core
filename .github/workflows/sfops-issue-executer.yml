@@ -24,7 +24,7 @@ jobs:
           
        
    
-   analyze-issues:
+ analyze-issues:
     name: 'Act on sfops issues'
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/issue-analyzer.yml@main
     with:
