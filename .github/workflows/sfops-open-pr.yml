@@ -15,6 +15,7 @@ jobs:
     with:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
       metrics-provider: 'datadog'
+      devhub-username : ${{ vars.DEVHUB_USERNAME }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
