@@ -75,11 +75,11 @@ jobs:
        domain: ${{ matrix.releaseName }}
        branchname: ${{ github.ref_name }}
        pathToReleaseConfigs: 'config'
-       dashboard-repo: sfops-dashboard
+       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
        releasename: ${{ vars.releaseName }}
-       metrics-provider: 'datadog'
-       workitem-url: 'https://github.com/${{github.repository}}/issues/'
-       workitem-filter: '(ISSUE)-[0-9]{3,4}'
+       metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
+       workitem-url: ${{ vars.SFOPS_ISSUETRACKER_URL }}
+       workitem-filter:  ${{ vars.SFOPS_ISSUETRACKER_WORKITEM_FILTER }}
        sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}

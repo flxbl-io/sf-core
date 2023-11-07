@@ -14,9 +14,10 @@ jobs:
       issue-body: ${{ github.event.issue.body }}
       issue-title:  ${{ github.event.issue.title }} 
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-      source-repo-url: https://github.com/flxbl-io/sf-core
-      workitem-url: https://github.com/flxbl-io/sf-core/issues
-      metrics-provider: 'datadog'
+      source-repo-url: https://github.com/${{github.repository}}
+      workitem-url:  ${{ vars.SFOPS_ISSUETRACKER_URL }}
+      metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
+      dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       issue-notifier: 'flxbl-io/sf-core'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}

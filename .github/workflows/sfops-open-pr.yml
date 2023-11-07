@@ -14,7 +14,7 @@ jobs:
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/pr-validate.yml@main
     with:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-      metrics-provider: 'datadog'
+      metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
       devhub-username : ${{ vars.DEVHUB_USERNAME }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
