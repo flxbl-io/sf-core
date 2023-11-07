@@ -1,4 +1,4 @@
-name: 'Job - CI Sandbox - Allocate to Pool'
+name: 'sfops - CI Sandbox - Allocate to Pool'
 
 # Read name of sandbox
 on:
@@ -6,40 +6,19 @@ on:
   schedule:
       - cron: '30 * * * *'   
 
-#Set the environment variables for tracking metrics
-env:
-  SFPOWERSCRIPTS_DATADOG: 'true'
-  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
-  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
 
 jobs:
-  check-ci-sandbox-status:
-    runs-on: ubuntu-latest
-    continue-on-error: true 
-    container: ghcr.io/flxbl-io/sfops:latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-         app-id: ${{ vars.SFOPSBOT_APP_ID }}
-         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-
-         
-      - name: 'Authenticate DevHub'
-        run: |
-              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
-              sfdx auth:sfdxurl:store -f authfile -a devhub
-
-      #Create a sandbox
-      - name: 'Provision sandboxes to Available'
-        uses:  flxbl-io/sfops-gh-actions/checkCISandboxStatus@main
-        with:
-          devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          usersToBeActivated: "buildbot@orde.com.au,provisioningcls@38trialforce.com"  
-          pathToPoolConfigFile: "config/sandbox-pool-config.json"
-          gh_token:  ${{ steps.app-token.outputs.token }}
-
+  allocate-ci-sandbox-to-pool:
+    name: 'Allocate  any created CI Sandboxe to pool'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/sandbox-pool-allocater.yml@main
+    with:
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+      path-to-config : "config/sandbox-pool-config.json"
+      metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 

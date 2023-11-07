@@ -1,17 +1,4 @@
-# DX@Scale CI/CD Template for GitHub
-#----------------------------------------------------------------------------------------------------
-# Follows reference pipeline available at docs.dxatscale.io
-# 
-#-----------------------------------------------------------------------------------------------------
-# To know more about dxatscale, visit https://docs.dxatscale.io
-# To know more on sfpowerscripts, visit- https://docs.dxatscale.io/sfpowerscripts/sfpowerscripts
-
-
-
-# This pipeline creates the CI pools used during validate
-
-
-name: 'Job - Replenish CI Pools (ScratchOrg)'
+name: 'sfops - Replenish CI Pools (ScratchOrg)'
 
 on:
   workflow_dispatch:
@@ -24,51 +11,24 @@ on:
     - cron: '0 14 * * *'
 
 
-#Set the environment variables for tracking metrics
-#env:
-  #SFPOWERSCRIPTS_NEWRELIC: 'true'
-  #SFPOWERSCRIPTS_NEWRELIC_API_KEY: '${{ secrets.NEWRELIC_INSIGHT_INSERT_KEYS }}'
-  #SFPOWERSCRIPTS_DATADOG: 'true'
-  #SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
-  #SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
-
-
-
 
 jobs:
 
   pool-ci-pool:
-    name: 'Replenish CI Pool'
-    runs-on: ubuntu-latest
-    container: ghcr.io/dxatscale/sfpowerscripts
-    timeout-minutes: 720 #Set to Maximum Time out
+    name: 'Create CI Scratch Org Pool'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/scratch-org-pool-creator.yml@main
+    with:
+      path-to-config : "config/scratch-ci-pool.json"
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+      dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+      metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+      git-ref: ${{ github.event.inputs.gitRef }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 
-    steps:
 
-      - uses: actions/checkout@v2
-        with: 
-         ref: ${{ github.event.inputs.gitRef }}
-         fetch-depth: 0
 
-   
-      - name: 'Authenticate Dev Hub'
-        run: |
-          echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
-          sf org login sfdx-url  -f authfile -a devhub
-
-      # Authenticate to npm
-      - uses: actions/setup-node@v3
-        with:
-         registry-url: 'https://npm.pkg.github.com'
-
-      - name: 'Prepare a pool of scratch orgs'
-        run: 'sfp orchestrator:prepare -f config/scratch-ci-pool.json -v devhub'
-        env:
-         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-      # Publish artifacts
-      - uses: actions/upload-artifact@v2
-        if: ${{ always() }}
-        with:
-          name: scratchorg-logs-pool-ci
-          path: .sfpowerscripts/prepare_logs

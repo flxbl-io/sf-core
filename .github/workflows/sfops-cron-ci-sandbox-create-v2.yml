@@ -1,4 +1,4 @@
-name: 'Job - CI Sandbox - Creator'
+name: 'sfops - CI Sandbox - Creator'
 
 # Read name of sandbox
 on:
@@ -14,78 +14,19 @@ env:
 
 jobs:
 
-  delete-ci-sandboxes:
-    runs-on: ubuntu-latest
-    container: ghcr.io/flxbl-io/sfops:latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: 'Authenticate DevHub'
-        run: |
-              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
-              sfdx auth:sfdxurl:store -f authfile -a devhub
-
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-         app-id: ${{ vars.SFOPSBOT_APP_ID }}
-         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-
-
-      #Create a sandbox
-      - name: 'Delete CI Sandboxes'
-        uses:  flxbl-io/sfops-gh-actions/deleteCISandboxes@main
-        with:
-          devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          gh_token: ${{ steps.app-token.outputs.token }}
-
-
-
-
   create-ci-sandbox:
-    runs-on: ubuntu-latest
-    needs: delete-ci-sandboxes
-    container: ghcr.io/flxbl-io/sfops:latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-            node-version: "18" 
-
-
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-         app-id: ${{ vars.SFOPSBOT_APP_ID }}
-         private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-
-
-      - name: Check time and exit if not within time range
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          # Get current hour in AEST
-          HOUR=$(TZ=":Australia/Melbourne" date +"%H")
-          if (( HOUR < 6 || HOUR > 20 )); then
-            echo "Outside of 6 AM - 8 PM AEST, exiting"
-            exit 1
-          fi
-
-      - name: 'Authenticate DevHub'
-        run: |
-              echo "${{ secrets.DEVHUB_SFDX_AUTH_URL }}" > ./authfile
-              sfdx auth:sfdxurl:store -f authfile -a devhub
-
-      #Create a sandbox
-      - name: 'Create CI Sandboxes'
-        uses:  flxbl-io/sfops-gh-actions/createCISandboxes@main
-        with:
-          pathToPoolConfigFile: "config/sandbox-pool-config.json"
-          devhub_sfdx_auth_url: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-          gh_token: ${{ steps.app-token.outputs.token }}
-
-
+    name: 'Create CI Sandboxes'
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/sandbox-pool-creator.yml@main
+    with:
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+      path-to-config : "config/sandbox-pool-config.json"
+      dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+      metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 
 
