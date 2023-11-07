@@ -14,6 +14,7 @@ jobs:
       issue-number: ${{ github.event.issue.number}}
       issue-body: ${{ github.event.issue.body }}
       issue-title:  ${{ github.event.issue.title }} 
+      metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}

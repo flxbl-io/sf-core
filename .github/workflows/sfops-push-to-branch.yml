@@ -1,7 +1,7 @@
 # build all packages
 
 
-name: 'Build-Test-Publish'
+name: 'sfops - On Push to Branch'
 
 
 on:
@@ -84,8 +84,8 @@ jobs:
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
-      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
-      datadog-host: ${{ secrets.DATADOG_HOST }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
       SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
