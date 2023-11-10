@@ -26,7 +26,6 @@ jobs:
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
       secrets:
-        DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
         DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
         SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
