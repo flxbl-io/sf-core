@@ -29,4 +29,3 @@ jobs:
         DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
         SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-        NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
