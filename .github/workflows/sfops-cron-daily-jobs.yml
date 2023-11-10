@@ -21,7 +21,7 @@ jobs:
 
   gh-reporter:
       name: 'Report Github Metrics'
-      uses:   ${{ customer.repo_owner }}/sfops-gh-actions/.github/workflows/gh-metrics-repoerter.yml@main
+      uses:   flxbl-io/sfops-gh-actions/.github/workflows/gh-metrics-repoerter.yml@main
       with:
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
