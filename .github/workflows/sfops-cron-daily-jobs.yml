@@ -20,20 +20,12 @@ jobs:
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 
   gh-reporter:
-    name: 'Report github metrics'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-           app-id: ${{ vars.SFOPSBOT_APP_ID }}
-           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-
-
-      - name: 'Run github metric reporter'  
-        run: |
-          node scripts/build-scripts/github-pr-status-reporter.js $(date "+%Y-%m-%d")
-        env:
-          GH_TOKEN: $${{ steps.app-token.outputs.token }}
+      name: 'Report Github Metrics'
+      uses:   flxbl-io/sfops-gh-actions/.github/workflows/gh-metrics-reporter.yml@main
+      with:
+         sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+         metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+      secrets:
+        DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+        SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
