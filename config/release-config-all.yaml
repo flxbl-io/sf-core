@@ -1,4 +1,4 @@
-releaseName: frameworks
+releaseName: all
 pool: ci
 excludeAllPackageDependencies: true 
 includeOnlyArtifacts:
