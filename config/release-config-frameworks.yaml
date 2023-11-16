@@ -1,5 +1,5 @@
 releaseName: frameworks
-pool: CORE
+pool: ci
 excludeAllPackageDependencies: true 
 includeOnlyArtifacts:
   - feature-management
