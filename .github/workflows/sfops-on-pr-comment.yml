@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - deploy-gate
-    if: ${{ needs.deploy-gate.outputs.continue == 'true'  &&  needs.deploy-gate.outputs.locked == 'true'}}
+    if: ${{ needs.deploy-gate.outputs.continue == 'true' }}
     container: ghcr.io/flxbl-io/sfops-lite:latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -88,7 +88,7 @@ jobs:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
       - analyze
-    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
+    if: ${{ needs.analyze.outputs.matrix != '[]' }}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
