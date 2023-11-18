@@ -143,7 +143,7 @@ jobs:
 
   result:
     needs: [deploy-gate, build-deploy]
-    runs-on: ubuntu-latest
+    runs-on: ghcr.io/flxbl-io/sfops-lite:latest
     # run even on failures but only if the trigger job set continue to true
     if: ${{ always() && needs.deploy-gate.outputs.continue == 'true' }}
 
