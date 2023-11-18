@@ -29,10 +29,7 @@ jobs:
           stable_branch: "main"
           sticky_locks: "true"
           github_token: ${{steps.app-token.outputs.token}}
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.branch-deploy.outputs.ref }}
+          unlock-on-merge-mode: "true"
 
 
   analyze:
