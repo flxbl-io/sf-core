@@ -78,7 +78,7 @@ jobs:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
       max-parallel: 1
-    uses: flxbl-io/sfops-gh-actions/.github/workflows/build-test-a-domain.yml@main
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/build-test-domain.yml@main
     with:
       releaseconfig: ${{ matrix.filePath }}
       domain: ${{ matrix.releaseName }}
