@@ -159,7 +159,7 @@ jobs:
             echo "The lock is not sticky, deleting the lock"
             gh api \
               --method DELETE \
-              repos/{owner}/{repo}/git/refs/heads/${{ needs.trigger.outputs.environment }}-branch-deploy-lock
+              repos/{owner}/{repo}/git/refs/heads/${{ needs.deploy-gate.outputs.environment }}-branch-deploy-lock
           fi
 
           rm lock.json
@@ -180,7 +180,7 @@ jobs:
         if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS != 'failure' }}
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
-          comment-id: ${{ needs.trigger.outputs.comment_id }}
+          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
           reactions: rocket
 
       # if the deployment failed, add a '-1' (thumbs down) reaction to the comment that triggered the deployment
@@ -188,7 +188,7 @@ jobs:
         if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS == 'failure' }}
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
-          comment-id: ${{ needs.trigger.outputs.comment_id }}
+          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
           reactions: '-1'
 
       # if the deployment was successful, add a 'success' comment
@@ -200,7 +200,7 @@ jobs:
           body: |
             ### Deployment Results ✅
 
-            **${{ needs.trigger.outputs.actor_handle }}** successfully deployed branch `${{ needs.trigger.outputs.ref }}` to **${{ needs.trigger.outputs.environment }}**
+            **${{ needs.deploy-gate.outputs.actor_handle }}** successfully deployed branch `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**
 
       # if the deployment was not successful, add a 'failure' comment
       - name: failure comment
@@ -211,4 +211,4 @@ jobs:
           body: |
             ### Deployment Results ❌
 
-            **${{ needs.trigger.outputs.actor_handle }}** had a failure when deploying `${{ needs.trigger.outputs.ref }}` to **${{ needs.trigger.outputs.environment }}**
+            **${{ needs.deploy-gate.outputs.actor_handle }}** had a failure when deploying `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**
