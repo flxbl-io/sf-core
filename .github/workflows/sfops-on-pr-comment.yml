@@ -8,6 +8,7 @@ jobs:
   deploy-gate:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
+    environment: QA
     outputs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
       issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
