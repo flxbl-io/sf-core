@@ -1,0 +1,214 @@
+name: "sfops - On Pull Request Comments"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  deploy-gate:
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    outputs:
+      continue: ${{ steps.branch-deploy.outputs.continue }}
+      issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
+      branch-ref: ${{ steps.branch-deploy.outputs.ref }}
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: branch-deploy
+        id: branch-deploy
+        uses: flxbl-io/sfops-gh-actions/branchDeploy@main
+        with:
+          reaction: "eyes"
+          stable_branch: "main"
+          sticky_locks: "true"
+          github_token: ${{steps.app-token.outputs.token}}
+          environment: test
+          skip_ci: "test"
+          skip_reviews: "test"
+          skip_completing: 'true'
+
+
+  analyze:
+    name: "Analyze Impacted Domains"
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-gate
+    if: ${{ needs.deploy-gate.outputs.continue == 'true' }}
+    container: ghcr.io/flxbl-io/sfops-lite:latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+          fetch-depth: 0
+
+      - name: Figure out the last tagged commit id
+        id: commit-finder
+        run: |
+          last_tag=$(git describe --tags --match '*_v*' --abbrev=0 2>/dev/null || true)
+
+          if [ -z "$last_tag" ]; then
+            echo "No tags found."
+            echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "Tag found: $last_tag"
+            echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Figure Impacted Release Defns"
+        uses: flxbl-io//sfops-gh-actions/impactedReleaseDefnDetector@main
+        with:
+          pathToReleaseDefns: "config"
+          from-commit: ${{ steps.commit-finder.outputs.last_tagged_commit }}
+          to-commit: HEAD
+
+      - name: Set matrix data
+        id: set-matrix
+        run: |
+          echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
+
+  build-deploy:
+    name: "Deploy ${{ matrix.releaseName }} to test environments"
+    needs:
+      - analyze
+    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 1
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/build-test-domain.yml@main
+    with:
+      releaseconfig: ${{ matrix.filePath }}
+      domain: ${{ matrix.releaseName }}
+      branchname: ${{ github.ref_name }}
+      branch-ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+      pathToReleaseConfigs: "config"
+      dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+      releasename: ${{ vars.releaseName }}
+      metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+      workitem-url: ${{ vars.SFOPS_ISSUETRACKER_URL }}
+      workitem-filter: ${{ vars.SFOPS_ISSUETRACKER_WORKITEM_FILTER }}
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# update the deployment result - manually complete the deployment that was created by the branch-deploy action
+  result:
+    needs: [deploy-gate, build-deploy]
+    runs-on: ubuntu-latest
+    # run even on failures but only if the trigger job set continue to true
+    if: ${{ always() && needs.deploy-gate.outputs.continue == 'true' }}
+
+    steps:
+      # if a previous step failed, set a variable to use as the deployment status
+      - name: set deployment status
+        id: deploy-status
+        if: ${{ needs.deploy-gate.result == 'failure' || needs.build-deploy.result == 'failure' }}
+        run: |
+          echo "DEPLOY_STATUS=failure" >> $GITHUB_OUTPUT
+
+      # use the GitHub CLI to update the deployment status that was initiated by the branch-deploy action
+      - name: Create a deployment status
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_STATUS: ${{ steps.deploy-status.outputs.DEPLOY_STATUS }}
+        run: |
+          if [ -z "${DEPLOY_STATUS}" ]; then
+            DEPLOY_STATUS="success"
+          fi
+
+          gh api \
+            --method POST \
+            repos/{owner}/{repo}/deployments/${{ needs.deploy-gate.outputs.deployment_id }}/statuses \
+            -f environment='${{ needs.deploy-gate.outputs.environment }}' \
+            -f state=${DEPLOY_STATUS}
+
+      # use the GitHub CLI to remove the non-sticky lock that was created by the branch-deploy action
+      - name: Remove a non-sticky lock
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Fetch the lock.json file from the branch
+          gh api \
+            --method GET \
+            repos/{owner}/{repo}/contents/lock.json?ref=${{ needs.deploy-gate.outputs.environment }}-branch-deploy-lock \
+            --jq '.content' \
+            | base64 --decode \
+            > lock.json
+          
+          # Check if the sticky value is true
+          if [ "$(jq -r '.sticky' lock.json)" = "true" ]; then
+            echo "The lock is sticky, skipping the delete step"
+          else
+            # use the GitHub CLI to remove the non-sticky lock that was created by the branch-deploy action
+            echo "The lock is not sticky, deleting the lock"
+            gh api \
+              --method DELETE \
+              repos/{owner}/{repo}/git/refs/heads/${{ needs.deploy-gate.outputs.environment }}-branch-deploy-lock
+          fi
+
+          rm lock.json
+
+      # remove the default 'eyes' reaction from the comment that triggered the deployment
+      # this reaction is added by the branch-deploy action by default
+      - name: remove eyes reaction
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            --method DELETE \
+            repos/{owner}/{repo}/issues/comments/${{ needs.deploy-gate.outputs.comment_id }}/reactions/${{ needs.deploy-gate.outputs.initial_reaction_id }}
+
+      # if the deployment was successful, add a 'rocket' reaction to the comment that triggered the deployment
+      - name: rocket reaction
+        if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS != 'failure' }}
+        uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
+        with:
+          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
+          reactions: rocket
+
+      # if the deployment failed, add a '-1' (thumbs down) reaction to the comment that triggered the deployment
+      - name: failure reaction
+        if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS == 'failure' }}
+        uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
+        with:
+          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
+          reactions: '-1'
+
+      # if the deployment was successful, add a 'success' comment
+      - name: success comment
+        if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS != 'failure' }}
+        uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d # pin@v2.1.1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### Deployment Results ✅
+
+            **${{ needs.deploy-gate.outputs.actor_handle }}** successfully deployed branch `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**
+
+      # if the deployment was not successful, add a 'failure' comment
+      - name: failure comment
+        if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS == 'failure' }}
+        uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d # pin@v2.1.1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### Deployment Results ❌
+
+            **${{ needs.deploy-gate.outputs.actor_handle }}** had a failure when deploying `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**

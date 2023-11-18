@@ -1,12 +1,21 @@
 [
   {
     "pool": "CORE",
+    "branch":"main",
+    "count": 2,
+    "sourceSB": "MASTERDEV"
+  },
+  {
+    "pool": "CORE",
+    "branch":"marvel",
     "count": 2,
     "sourceSB": "MASTERDEV"
   },
   {
     "pool": "HOTFIX",
+    "branch":"release",
     "count": 1,
-    "sourceSB": "production"
+    "sourceSB": "production",
+    "usersToBeActivated":"azlam@adiza.dev"
   }
 ]
