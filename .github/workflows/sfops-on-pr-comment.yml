@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - deploy-gate
+    if: ${{ needs.deploy-gate.outputs.continue == 'true' }}
     container: ghcr.io/flxbl-io/sfops-lite:latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
