@@ -12,6 +12,7 @@ jobs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
       issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
+      locked: ${{ steps.lock.outputs.locked }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -27,12 +28,20 @@ jobs:
         with:
           reaction: "eyes"
           stable_branch: "main"
-          sticky_locks: "true"
           github_token: ${{steps.app-token.outputs.token}}
           environment: test
           skip_ci: "test"
           skip_reviews: "test"
           skip_completing: 'true'
+    
+
+      - uses: github/lock@v2.1.2
+        id: lock
+        with:
+         mode: 'lock'
+         environment: 'test'
+         environment_targets: 'test'
+         github_token: ${{steps.app-token.outputs.token}}
 
 
   analyze:
@@ -79,7 +88,7 @@ jobs:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
       - analyze
-    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
+    if: ${{ needs.analyze.outputs.matrix != '[]' }}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
@@ -105,7 +114,7 @@ jobs:
       SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-# update the deployment result - manually complete the deployment that was created by the branch-deploy action
+
   result:
     needs: [deploy-gate, build-deploy]
     runs-on: ubuntu-latest
@@ -137,32 +146,15 @@ jobs:
             -f environment='${{ needs.deploy-gate.outputs.environment }}' \
             -f state=${DEPLOY_STATUS}
 
-      # use the GitHub CLI to remove the non-sticky lock that was created by the branch-deploy action
-      - name: Remove a non-sticky lock
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Fetch the lock.json file from the branch
-          gh api \
-            --method GET \
-            repos/{owner}/{repo}/contents/lock.json?ref=${{ needs.deploy-gate.outputs.environment }}-branch-deploy-lock \
-            --jq '.content' \
-            | base64 --decode \
-            > lock.json
-          
-          # Check if the sticky value is true
-          if [ "$(jq -r '.sticky' lock.json)" = "true" ]; then
-            echo "The lock is sticky, skipping the delete step"
-          else
-            # use the GitHub CLI to remove the non-sticky lock that was created by the branch-deploy action
-            echo "The lock is not sticky, deleting the lock"
-            gh api \
-              --method DELETE \
-              repos/{owner}/{repo}/git/refs/heads/${{ needs.deploy-gate.outputs.environment }}-branch-deploy-lock
-          fi
 
-          rm lock.json
+      - uses: github/lock@v2.1.2
+        id: unlock
+        with:
+         mode: 'unlock'
+         environment: 'test'
+         environment_targets: 'test'
+         github_token: ${{ github.token }}
+
 
       # remove the default 'eyes' reaction from the comment that triggered the deployment
       # this reaction is added by the branch-deploy action by default
