@@ -60,7 +60,7 @@ jobs:
            echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
   
 
-  build-deploy-publish:
+  publish:
     name: 'Build, Deploy & Publish ${{ matrix.releaseName }}'
     needs: 
       - analyze
