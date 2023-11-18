@@ -1,0 +1,100 @@
+name: "sfops - On Pull Request Comments"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  deploy-gate:
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    outputs:
+      continue: ${{ steps.branch-deploy.outputs.continue }}
+      issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
+      branch-ref: ${{ steps.branch-deploy.outputs.ref }}
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: branch-deploy
+        id: branch-deploy
+        uses: flxbl-io/sfops-gh-actions/branchDeploy@main
+        with:
+          reaction: "eyes"
+          stable_branch: "main"
+          sticky_locks: "true"
+          github_token: ${{steps.app-token.outputs.token}}
+
+  analyze:
+    name: "Analyze Impacted Domains"
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-gate
+    container: ghcr.io/flxbl-io/sfops-lite:latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+          fetch-depth: 0
+
+      - name: Figure out the last tagged commit id
+        id: commit-finder
+        run: |
+          last_tag=$(git describe --tags --match '*_v*' --abbrev=0 2>/dev/null || true)
+
+          if [ -z "$last_tag" ]; then
+            echo "No tags found."
+            echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "Tag found: $last_tag"
+            echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Figure Impacted Release Defns"
+        uses: flxbl-io//sfops-gh-actions/impactedReleaseDefnDetector@main
+        with:
+          pathToReleaseDefns: "config"
+          from-commit: ${{ steps.commit-finder.outputs.last_tagged_commit }}
+          to-commit: HEAD
+
+      - name: Set matrix data
+        id: set-matrix
+        run: |
+          echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
+
+  build-deploy:
+    name: "Deploy ${{ matrix.releaseName }} to test environments"
+    needs:
+      - analyze
+    if: ${{ needs.analyze.outputs.matrix != '[]' && needs.analyze.outputs.matrix != '' }}
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 1
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/build-test-domain.yml@main
+    with:
+      releaseconfig: ${{ matrix.filePath }}
+      domain: ${{ matrix.releaseName }}
+      branchname: ${{ github.ref_name }}
+      branch-ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+      pathToReleaseConfigs: "config"
+      dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+      releasename: ${{ vars.releaseName }}
+      metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+      workitem-url: ${{ vars.SFOPS_ISSUETRACKER_URL }}
+      workitem-filter: ${{ vars.SFOPS_ISSUETRACKER_WORKITEM_FILTER }}
+      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
+    secrets:
+      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
+      SB_SFDX_AUTH_URL: ${{ secrets.SB_SFDX_AUTH_URL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
+      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
