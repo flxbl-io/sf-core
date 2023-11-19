@@ -14,6 +14,12 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
+      
+      - name: rocket reaction
+        uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
+        with:
+          comment-id: ${{ github.event.comment.id}}
+          reactions: eyes
 
       - uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
@@ -117,12 +123,6 @@ jobs:
       fail-fast: false
     steps:
 
-      - name: rocket reaction
-        uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
-        with:
-          comment-id: ${{ github.event.comment.id}}
-          reactions: eyes
-
       - uses: actions/create-github-app-token@v1
         id: app-token
         name: "Get installation token for sfopsbot"
@@ -148,10 +148,9 @@ jobs:
           body: |
             Hello @${{ github.event.issue.user.login }} :wave:
 
-            There is another deployment in progress, so the issue is locked by ${{steps.unlock.outputs.issue-number}}
+            There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
             
-            Please proceed to https://github.com/${{github.repository}}/pulls/${{steps.unlock.outputs.issue-number}}
-            to unlock the issue
+            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
 
 
 
