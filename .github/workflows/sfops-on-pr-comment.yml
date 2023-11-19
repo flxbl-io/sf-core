@@ -81,7 +81,7 @@ jobs:
         with:
           allow-repeats: false
           message-id:  ${{ github.event.issue.number }}
-          refresh-message-position: false
+          refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
             ### Deployment In Progress 🚀
