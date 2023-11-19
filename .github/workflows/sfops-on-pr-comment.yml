@@ -17,6 +17,12 @@ jobs:
 
       - uses: xt0rted/pull-request-comment-branch@v2
         id: comment-branch
+      
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.comment-branch.outputs.head_sha }}
+
 
       - name: "Figure Impacted Release Defns"
         uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
@@ -37,7 +43,7 @@ jobs:
       - analyze
     outputs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
-      issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
+      issue-number: ${{ github.event.issue.number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
       locked: ${{ steps.lock.outputs.locked }}
     steps:
@@ -49,12 +55,14 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
+         
+
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: lock_check
         with:
          mode: 'check'
-         environment: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
-         environment_targets: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
+         environment: 'test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}'
+         environment_targets: 'test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
       - name: If a lock already exists
@@ -80,9 +88,9 @@ jobs:
           reaction: "eyes"
           stable_branch: "main"
           github_token: ${{steps.app-token.outputs.token}}
-          environment: test
-          skip_ci: "test"
-          skip_reviews: "test"
+          environment: test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}
+          skip_ci: test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}
+          skip_reviews: test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}
           skip_completing: 'true'
     
 
@@ -91,8 +99,8 @@ jobs:
         if: ${{ steps.lock_check.outputs.locked != 'true' }}
         with:
          mode: 'lock'
-         environment: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
-         environment_targets: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
+         environment: 'test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}'
+         environment_targets: 'test-${{ fromJson(needs.analyze.outputs.matrix).releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
   deploy-unlock:
