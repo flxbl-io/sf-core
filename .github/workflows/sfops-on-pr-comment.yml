@@ -90,7 +90,7 @@ jobs:
 
             There is another deployment in progress, please request deployment after some time.
           
-            Deploment locked for   **${{steps.lock_check.outputs.branch}}** by **${{steps.lock_check.outputs.created_by}}**
+            Deploment locked for   **${{ steps.unlock.outputs.issue-number }}** 
             
 
       - name: branch-deploy
