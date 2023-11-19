@@ -75,7 +75,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            ### Deployment In Progress
+            ### Deployment In Progress 🚀
 
             Hello @${{ github.event.issue.user.login }} :wave:
 
@@ -116,6 +116,13 @@ jobs:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
     steps:
+
+      - name: rocket reaction
+        uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
+        with:
+          comment-id: ${{ github.event.comment.id}}
+          reactions: eyes
+
       - uses: actions/create-github-app-token@v1
         id: app-token
         name: "Get installation token for sfopsbot"
@@ -132,9 +139,23 @@ jobs:
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
+
+      - name: If the issue doesnt match
+        if: ${{ steps.unlock.outputs.issue-match == 'false' }}
+        uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d 
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+
+            There is another deployment in progress, so the issue is locked by ${{steps.unlock.outputs.issue-number}}
+            
+            Please proceed to https://github.com/${{github.repository}}/pulls/${{steps.unlock.outputs.issue-number}}
+            to unlock the issue
+
+
+
   
-
-
 
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
