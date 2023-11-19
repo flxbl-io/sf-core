@@ -18,6 +18,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Dump GitHub context
+        run:  echo ${{ toJSON(github) }}
+
       - name: Figure out the last tagged commit id
         id: commit-finder
         run: |
@@ -35,7 +38,7 @@ jobs:
         uses: flxbl-io//sfops-gh-actions/impactedReleaseDefnDetector@main
         with:
           pathToReleaseDefns: "config"
-          from-commit: ${{ github.event.pull_request.base.sha }}
+          from-commit: ${{ github.event.issue.pull_request.base.sha }}
           to-commit: ${{ github.event.pull_request.head.sha }}  
 
       - name: Set matrix data
