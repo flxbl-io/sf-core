@@ -66,18 +66,18 @@ jobs:
           owner: ${{ github.repository_owner }}
 
          
-
       - uses: flxbl-io/sfops-gh-actions/lock@main
-        id: lock_check
+        id: unlock
+        continue-on-error: true
         with:
-         mode: 'check'
+         mode: 'unlock-on-comment'
          environment: 'test-${{ matrix.releaseName }}'
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
       - uses: mshick/add-pr-comment@v2
         name: If a lock already exists
-        if: ${{ steps.lock_check.outputs.locked == 'true' }}
+        if: ${{ steps.unlock.outputs.issue-match == 'false' }}
         with:
           allow-repeats: false
           message-id:  ${{ github.event.issue.number }}
@@ -95,7 +95,7 @@ jobs:
 
       - name: branch-deploy
         id: branch-deploy
-        if: ${{ steps.lock_check.outputs.locked != 'true' }}
+        if: ${{ steps.unlock.outcome == 'success' }}
         uses: flxbl-io/sfops-gh-actions/branchDeploy@main
         with:
           reaction: "eyes"
@@ -109,7 +109,7 @@ jobs:
 
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: lock
-        if: ${{ steps.lock_check.outputs.locked != 'true' }}
+        if: ${{ steps.unlock.outcome == 'success' }}
         with:
          mode: 'lock'
          environment: 'test-${{ matrix.releaseName }}'
