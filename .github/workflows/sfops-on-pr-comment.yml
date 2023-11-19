@@ -35,8 +35,8 @@ jobs:
         uses: flxbl-io//sfops-gh-actions/impactedReleaseDefnDetector@main
         with:
           pathToReleaseDefns: "config"
-          from-commit: ${{ steps.commit-finder.outputs.last_tagged_commit }}
-          to-commit: HEAD
+          from-commit: ${{ github.event.pull_request.base.sha }}
+          to-commit: ${{ github.event.pull_request.head.sha }}  
 
       - name: Set matrix data
         id: set-matrix
