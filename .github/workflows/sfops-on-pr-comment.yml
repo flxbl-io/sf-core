@@ -14,32 +14,16 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Dump GitHub context
-        run:  echo ${{ toJSON(github) }}
-
-      - name: Figure out the last tagged commit id
-        id: commit-finder
-        run: |
-          last_tag=$(git describe --tags --match '*_v*' --abbrev=0 2>/dev/null || true)
-
-          if [ -z "$last_tag" ]; then
-            echo "No tags found."
-            echo "last_tagged_commit=$(git rev-list --max-parents=0 HEAD)" >> $GITHUB_OUTPUT
-          else
-            echo "Tag found: $last_tag"
-            echo "last_tagged_commit=$(git rev-parse $last_tag)" >> $GITHUB_OUTPUT
-          fi
+      - uses: xt0rted/pull-request-comment-branch@v2
+        id: comment-branch
 
       - name: "Figure Impacted Release Defns"
-        uses: flxbl-io//sfops-gh-actions/impactedReleaseDefnDetector@main
+        uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
         with:
           pathToReleaseDefns: "config"
-          from-commit: ${{ github.event.issue.pull_request.base.sha }}
-          to-commit: ${{ github.event.pull_request.head.sha }}  
+          from-commit: ${{ steps.comment-branch.outputs.base_sha }}
+          to-commit:  ${{ steps.comment-branch.outputs.head_sha }}
 
       - name: Set matrix data
         id: set-matrix
