@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy-gate:
-    if: ${{ github.event.issue.pull_request }}
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, 'sfops commit') }}
     runs-on: ubuntu-latest
     outputs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
@@ -30,8 +30,7 @@ jobs:
          environment_targets: 'test'
          github_token: ${{steps.app-token.outputs.token}}
 
-   # if the deployment was successful, add a 'success' comment
-      - name: success comment
+      - name: If a lock already exists
         if: ${{ steps.lock_check.outputs.locked == 'true' }}
         uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d 
         with:
@@ -172,14 +171,6 @@ jobs:
             -f environment='${{ needs.deploy-gate.outputs.environment }}' \
             -f state=${DEPLOY_STATUS}
 
-
-      - uses: github/lock@v2.1.2
-        id: unlock
-        with:
-         mode: 'unlock'
-         environment: 'test'
-         environment_targets: 'test'
-         github_token: ${{ github.token }}
 
 
       # remove the default 'eyes' reaction from the comment that triggered the deployment
