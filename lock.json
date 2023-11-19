@@ -1,0 +1,1 @@
+{"reason":"deployment","branch":"feat/test-ci-pool","created_at":"2023-11-19T08:28:47.119Z","created_by":"azlam-abdulsalam","sticky":false,"environment":"test","global":false,"unlock_command":"sfops unlock test","link":"https://github.com/flxbl-io/sf-core/pull/68#issuecomment-1817785653"}
