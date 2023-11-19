@@ -43,7 +43,7 @@ jobs:
       - analyze
     outputs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
-      issue-number: ${{ steps.branch-deploy.outputs.issue-number }}
+      issue-number: ${{ github.event.issue.number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
       locked: ${{ steps.lock.outputs.locked }}
     steps:
