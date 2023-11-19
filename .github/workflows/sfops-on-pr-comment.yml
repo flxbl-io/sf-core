@@ -36,7 +36,7 @@ jobs:
         with:
           pathToReleaseDefns: "config"
           from-commit: ${{ steps.commit-finder.outputs.last_tagged_commit }}
-          to-commit: HEAD
+          to-commit: ${{ github.base_ref }}
 
       - name: Set matrix data
         id: set-matrix
