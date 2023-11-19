@@ -1,0 +1,1 @@
+{"reason":"deployment","branch":"test/feat-2","created_at":"2023-11-19T11:51:10.704Z","created_by":"azlam-abdulsalam","sticky":false,"environment":"test-unpackaged","global":false,"unlock_command":"sfops unlock test-unpackaged","link":"https://github.com/flxbl-io/sf-core/pull/69#issuecomment-1817830655"}
