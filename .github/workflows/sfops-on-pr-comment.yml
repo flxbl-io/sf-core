@@ -46,7 +46,7 @@ jobs:
 
 
   deploy-gate:
-    if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops test') }}
+    if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops commit') }}
     runs-on: ubuntu-latest
     needs: 
       - analyze
