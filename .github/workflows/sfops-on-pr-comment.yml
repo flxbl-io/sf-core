@@ -34,6 +34,7 @@ jobs:
       - name: Set matrix data
         id: set-matrix
         run: |
+          cat impacted-release-configs.json
           echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
 
   deploy-lock:
