@@ -14,7 +14,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      
+
       - name: rocket reaction
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
@@ -75,20 +75,23 @@ jobs:
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
-      - name: If a lock already exists
+      - uses: mshick/add-pr-comment@v2
+        name: If a lock already exists
         if: ${{ steps.lock_check.outputs.locked == 'true' }}
-        uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d 
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
+          allow-repeats: false
+          message-id:  ${{ github.event.issue.number }}
+          refresh-message-position: true
+          repo-token: ${{ steps.app-token.outputs.token }}
+          message: |
             ### Deployment In Progress 🚀
 
             Hello @${{ github.event.issue.user.login }} :wave:
 
             There is another deployment in progress, please request deployment after some time.
-            
+          
             Deploment locked for   **${{steps.lock_check.outputs.branch}}** by **${{steps.lock_check.outputs.created_by}}**
-
+            
 
       - name: branch-deploy
         id: branch-deploy
@@ -139,22 +142,22 @@ jobs:
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
-
-      - name: If the issue doesnt match
+      - uses: mshick/add-pr-comment@v2
+        name: If the issue doesnt match
         if: ${{ steps.unlock.outputs.issue-match == 'false' }}
-        uses: peter-evans/create-or-update-comment@67dcc547d311b736a8e6c5c236542148a47adc3d 
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Hello @${{ github.event.issue.user.login }} :wave:
+          allow-repeats: false
+          message-id:  ${{ github.event.issue.number }}
+          refresh-message-position: true
+          repo-token: ${{ steps.app-token.outputs.token }}
+          message: |
+           Hello @${{ github.event.issue.user.login }} :wave:
 
             There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
             
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
 
-
-
-  
+          
 
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
