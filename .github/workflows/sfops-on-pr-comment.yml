@@ -40,6 +40,9 @@ jobs:
   deploy-lock:
     if: ${{ needs.analyze.outputs.matrix != '[]' &&  github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops commit') }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
     needs: 
       - analyze
     outputs:
@@ -62,8 +65,8 @@ jobs:
         id: lock_check
         with:
          mode: 'check'
-         environment: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
-         environment_targets: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
+         environment: 'test-${{ matrix.releaseName }}'
+         environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
       - name: If a lock already exists
@@ -89,9 +92,9 @@ jobs:
           reaction: "eyes"
           stable_branch: "main"
           github_token: ${{steps.app-token.outputs.token}}
-          environment: test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}
-          skip_ci: test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}
-          skip_reviews: test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}
+          environment: test-${{ matrix.releaseName }}
+          skip_ci: test-${{ matrix.releaseName }}
+          skip_reviews: test-${{ matrix.releaseName }}
           skip_completing: 'true'
     
 
@@ -100,8 +103,8 @@ jobs:
         if: ${{ steps.lock_check.outputs.locked != 'true' }}
         with:
          mode: 'lock'
-         environment: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
-         environment_targets: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
+         environment: 'test-${{ matrix.releaseName }}'
+         environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
   deploy-unlock:
@@ -109,6 +112,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - analyze
+    strategy:
+      matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
+      fail-fast: false
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -123,8 +129,8 @@ jobs:
         if: ${{ steps.lock_check.outputs.locked != 'true' }}
         with:
          mode: 'unlock'
-         environment: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
-         environment_targets: 'test-${{ fromJson(needs.analyze.outputs.matrix).include.releaseName }}'
+         environment: 'test-${{ matrix.releaseName }}'
+         environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
   
