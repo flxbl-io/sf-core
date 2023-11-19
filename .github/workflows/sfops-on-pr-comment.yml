@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+          ref: ${{ needs.deploy-lock.outputs.branch-ref }}
           fetch-depth: 0
 
       - name: Figure out the last tagged commit id
@@ -44,9 +44,8 @@ jobs:
         run: |
           echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
 
-
-  deploy-gate:
-    if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops commit') }}
+  deploy-lock:
+    if: ${{ needs.analyze.outputs.matrix != '[]' &&  github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops commit') }}
     runs-on: ubuntu-latest
     needs: 
       - analyze
@@ -64,7 +63,7 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - uses: github/lock@v2.1.2
+      - uses: flxbl-io/sfops-gh-actions/lock@main
         id: lock_check
         with:
          mode: 'check'
@@ -101,21 +100,37 @@ jobs:
           skip_completing: 'true'
     
 
-      - uses: github/lock@v2.1.2
+      - uses: flxbl-io/sfops-gh-actions/lock@main
         id: lock
         if: ${{ steps.lock_check.outputs.locked != 'true' }}
         with:
          mode: 'lock'
-         environment: 'test'
-         environment_targets: 'test'
+         environment: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
+         environment_targets: 'test-${{needs.analyze.outputs.matrix.releaseName}}'
          github_token: ${{steps.app-token.outputs.token}}
+
+  deploy-unlock:
+    if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops unlock') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+  
+
+
 
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
       - analyze
-      - deploy-gate
-    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-gate.outputs.continue == 'true'}}
+      - deploy-lock
+    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.outputs.continue == 'true'}}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
@@ -125,7 +140,7 @@ jobs:
       releaseconfig: ${{ matrix.filePath }}
       domain: ${{ matrix.releaseName }}
       branchname: ${{ github.ref_name }}
-      branch-ref: ${{ needs.deploy-gate.outputs.branch-ref }}
+      branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       releasename: ${{ vars.releaseName }}
@@ -142,16 +157,16 @@ jobs:
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   result:
-    needs: [deploy-gate, build-deploy]
+    needs: [deploy-lock, build-deploy]
     runs-on: ghcr.io/flxbl-io/sfops-lite:latest
     # run even on failures but only if the trigger job set continue to true
-    if: ${{ always() && needs.deploy-gate.outputs.continue == 'true' }}
+    if: ${{ always() && needs.deploy-lock.outputs.continue == 'true' }}
 
     steps:
       # if a previous step failed, set a variable to use as the deployment status
       - name: set deployment status
         id: deploy-status
-        if: ${{ needs.deploy-gate.result == 'failure' || needs.build-deploy.result == 'failure' }}
+        if: ${{ needs.deploy-lock.result == 'failure' || needs.build-deploy.result == 'failure' }}
         run: |
           echo "DEPLOY_STATUS=failure" >> $GITHUB_OUTPUT
 
@@ -168,8 +183,8 @@ jobs:
 
           gh api \
             --method POST \
-            repos/{owner}/{repo}/deployments/${{ needs.deploy-gate.outputs.deployment_id }}/statuses \
-            -f environment='${{ needs.deploy-gate.outputs.environment }}' \
+            repos/{owner}/{repo}/deployments/${{ needs.deploy-lock.outputs.deployment_id }}/statuses \
+            -f environment='${{ needs.deploy-lock.outputs.environment }}' \
             -f state=${DEPLOY_STATUS}
 
 
@@ -183,14 +198,14 @@ jobs:
         run: |
           gh api \
             --method DELETE \
-            repos/{owner}/{repo}/issues/comments/${{ needs.deploy-gate.outputs.comment_id }}/reactions/${{ needs.deploy-gate.outputs.initial_reaction_id }}
+            repos/{owner}/{repo}/issues/comments/${{ needs.deploy-lock.outputs.comment_id }}/reactions/${{ needs.deploy-lock.outputs.initial_reaction_id }}
 
       # if the deployment was successful, add a 'rocket' reaction to the comment that triggered the deployment
       - name: rocket reaction
         if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS != 'failure' }}
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
-          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
+          comment-id: ${{ needs.deploy-lock.outputs.comment_id }}
           reactions: rocket
 
       # if the deployment failed, add a '-1' (thumbs down) reaction to the comment that triggered the deployment
@@ -198,7 +213,7 @@ jobs:
         if: ${{ steps.deploy-status.outputs.DEPLOY_STATUS == 'failure' }}
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
-          comment-id: ${{ needs.deploy-gate.outputs.comment_id }}
+          comment-id: ${{ needs.deploy-lock.outputs.comment_id }}
           reactions: '-1'
 
       # if the deployment was successful, add a 'success' comment
@@ -210,7 +225,7 @@ jobs:
           body: |
             ### Deployment Results ✅
 
-            **${{ needs.deploy-gate.outputs.actor_handle }}** successfully deployed branch `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**
+            **${{ needs.deploy-lock.outputs.actor_handle }}** successfully deployed branch `${{ needs.deploy-lock.outputs.ref }}` to **${{ needs.deploy-lock.outputs.environment }}**
 
       # if the deployment was not successful, add a 'failure' comment
       - name: failure comment
@@ -221,4 +236,4 @@ jobs:
           body: |
             ### Deployment Results ❌
 
-            **${{ needs.deploy-gate.outputs.actor_handle }}** had a failure when deploying `${{ needs.deploy-gate.outputs.ref }}` to **${{ needs.deploy-gate.outputs.environment }}**
+            **${{ needs.deploy-lock.outputs.actor_handle }}** had a failure when deploying `${{ needs.deploy-lock.outputs.ref }}` to **${{ needs.deploy-lock.outputs.environment }}**
