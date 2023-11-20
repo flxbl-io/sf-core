@@ -16,13 +16,15 @@ jobs:
 
     steps:
 
-      - name: rocket reaction
+      - name: Add a reaction
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
           comment-id: ${{ github.event.comment.id}}
           reactions: eyes
+  
 
       - uses: xt0rted/pull-request-comment-branch@v2
+        name: Figure out the commit refs
         id: comment-branch
       
       - name: Checkout
@@ -154,7 +156,7 @@ jobs:
         if: ${{ steps.unlock.outputs.issue-match == 'false' }}
         with:
           allow-repeats: false
-          message-id:  ${{ github.event.issue.number }}
+          message-id:  issue-${{ github.event.issue.number }}
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
@@ -164,6 +166,22 @@ jobs:
             
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
             by typing in sfops unlock.
+
+      - uses: mshick/add-pr-comment@v2
+        name: If the issue matches
+        if: ${{ steps.unlock.outputs.unlocked == 'true' }}
+        with:
+          allow-repeats: false
+          message-id:  issue-${{ github.event.issue.number }}
+          refresh-message-position: true
+          repo-token: ${{ steps.app-token.outputs.token }}
+          message: |
+            Hello @${{ github.event.issue.user.login }} :wave:
+
+            Alright, you have succesfully removed the lock on the issue  https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}}
+
+            Please note this is not side effect free, your earlier deployments still persist on environment, You would need to do  a manual cleanup
+            on the environment to remove the feature
   
           
 
