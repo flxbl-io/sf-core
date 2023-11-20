@@ -114,7 +114,7 @@ jobs:
       - uses: flxbl-io/sfops-gh-actions/lock@main
         name: Claim Deployment Lock to Test Environments
         id: lock
-        if:  ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlock == 'true'}}
+        if:  ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlocked == 'true'}}
         with:
          mode: 'lock'
          environment: 'test-${{ matrix.releaseName }}'
