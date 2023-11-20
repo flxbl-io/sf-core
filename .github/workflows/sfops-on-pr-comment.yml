@@ -16,13 +16,15 @@ jobs:
 
     steps:
 
-      - name: rocket reaction
+      - name: Add a reaction
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
           comment-id: ${{ github.event.comment.id}}
           reactions: eyes
+  
 
       - uses: xt0rted/pull-request-comment-branch@v2
+        name: Figure out the commit refs
         id: comment-branch
       
       - name: Checkout
