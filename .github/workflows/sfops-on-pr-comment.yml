@@ -56,7 +56,7 @@ jobs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
       issue-number: ${{ github.event.issue.number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
-      locked: ${{ steps.lock.outputs.locked }}
+      locked: ${{ steps.lock.outcome }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -121,6 +121,8 @@ jobs:
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
+  
+
   deploy-unlock:
     if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops unlock') }}
     runs-on: ubuntu-latest
@@ -170,7 +172,7 @@ jobs:
     needs:
       - analyze
       - deploy-lock
-    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.outputs.locked == 'true'}}
+    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.outputs.locked == 'success'}}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
