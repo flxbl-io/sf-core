@@ -95,7 +95,7 @@ jobs:
 
       - name: branch-deploy
         id: branch-deploy
-        if: ${{ steps.unlock.outcome == 'success' }}
+        if: ${{ steps.unlock.outcome == 'success' && steps.unlock.outputs.unlock == 'true'}}
         uses: flxbl-io/sfops-gh-actions/branchDeploy@main
         with:
           reaction: "eyes"
@@ -109,7 +109,7 @@ jobs:
 
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: lock
-        if: ${{ steps.unlock.outcome == 'success' }}
+        if: ${{ steps.unlock.outcome == 'success' && steps.unlock.outputs.unlock == 'true'}}
         with:
          mode: 'lock'
          environment: 'test-${{ matrix.releaseName }}'
