@@ -13,6 +13,7 @@ jobs:
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+
     steps:
 
       - name: rocket reaction
@@ -178,7 +179,7 @@ jobs:
     with:
       releaseconfig: ${{ matrix.filePath }}
       domain: ${{ matrix.releaseName }}
-      branchname: ${{ github.ref_name }}
+      branchname: ${{ needs.deploy-lock.outputs.branch-ref }}
       branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
