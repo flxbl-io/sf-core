@@ -170,7 +170,7 @@ jobs:
     needs:
       - analyze
       - deploy-lock
-    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.locked == 'true'}}
+    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.outputs.locked == 'true'}}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
