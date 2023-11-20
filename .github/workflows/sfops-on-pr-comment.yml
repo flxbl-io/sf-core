@@ -98,7 +98,7 @@ jobs:
 
       - name: Check for status
         id: branch-deploy
-        if: ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlock == 'true'}}
+        if: ${{ steps.unlock.outcome=='failure' || steps.unlock.outputs.unlocked == 'true' }}
         uses: flxbl-io/sfops-gh-actions/branchDeploy@main
         with:
           reaction: "eyes"
