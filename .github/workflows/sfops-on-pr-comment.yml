@@ -13,6 +13,7 @@ jobs:
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+
     steps:
 
       - name: rocket reaction
@@ -88,9 +89,11 @@ jobs:
 
             Hello @${{ github.event.issue.user.login }} :wave:
 
-            There is another deployment in progress, please request deployment after some time.
-          
-            Deploment locked for   **${{ steps.unlock.outputs.issue-number }}** 
+            There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
+              
+            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
+            by typing in sfops unlock.
+  
             
 
       - name: Check for status
@@ -100,6 +103,7 @@ jobs:
         with:
           reaction: "eyes"
           stable_branch: "main"
+          release_name: ${{ matrix.releaseName }}
           github_token: ${{steps.app-token.outputs.token}}
           environment: test-${{ matrix.releaseName }}
           skip_ci: test-${{ matrix.releaseName }}
@@ -152,12 +156,13 @@ jobs:
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
-           Hello @${{ github.event.issue.user.login }} :wave:
+            Hello @${{ github.event.issue.user.login }} :wave:
 
             There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
             
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
-
+            by typing in sfops unlock.
+  
           
 
   build-deploy:
@@ -165,7 +170,7 @@ jobs:
     needs:
       - analyze
       - deploy-lock
-    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.outputs.continue == 'true'}}
+    if: ${{ needs.analyze.outputs.matrix != '[]'  && needs.deploy-lock.locked == 'true'}}
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
@@ -174,7 +179,7 @@ jobs:
     with:
       releaseconfig: ${{ matrix.filePath }}
       domain: ${{ matrix.releaseName }}
-      branchname: ${{ github.ref_name }}
+      branchname: ${{ needs.deploy-lock.outputs.branch-ref }}
       branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
