@@ -90,7 +90,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   
- deploy-unlock:
+  deploy-unlock:
     runs-on: ubuntu-latest
     needs:
       - analyze
