@@ -59,6 +59,7 @@ jobs:
       issue-number: ${{ github.event.issue.number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
       locked: ${{ steps.lock.outcome }}
+      base-ref: ${{ steps.branch-deploy.outputs.base_ref }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -201,6 +202,7 @@ jobs:
       domain: ${{ matrix.releaseName }}
       branchname: ${{ needs.deploy-lock.outputs.branch-ref }}
       branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
+      base-branch: ${{ needs.deploy-lock.outputs.base-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       releasename: ${{ vars.releaseName }}
