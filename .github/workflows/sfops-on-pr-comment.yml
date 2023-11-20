@@ -80,7 +80,7 @@ jobs:
         if: ${{ steps.unlock.outputs.issue-match == 'false' }}
         with:
           allow-repeats: false
-          message-id:  ${{ github.event.issue.number }}
+          message-id:  issue-${{ github.event.issue.number }}
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
@@ -93,7 +93,7 @@ jobs:
             Deploment locked for   **${{ steps.unlock.outputs.issue-number }}** 
             
 
-      - name: branch-deploy
+      - name: Check for status
         id: branch-deploy
         if: ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlock == 'true'}}
         uses: flxbl-io/sfops-gh-actions/branchDeploy@main
@@ -108,6 +108,7 @@ jobs:
     
 
       - uses: flxbl-io/sfops-gh-actions/lock@main
+        name: Claim Deployment Lock to Test Environments
         id: lock
         if:  ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlock == 'true'}}
         with:
