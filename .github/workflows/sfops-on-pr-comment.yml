@@ -10,7 +10,7 @@ jobs:
     name: "Analyze Impacted Domains"
     runs-on: ubuntu-latest
     container: ghcr.io/flxbl-io/sfops-lite:latest
-    if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops commit') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
+    if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -44,7 +44,7 @@ jobs:
           echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
 
   deploy-lock:
-    if: ${{ needs.analyze.outputs.matrix != '[]' &&  github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops commit') }}
+    if: ${{ needs.analyze.outputs.matrix != '[]' &&  github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops test') }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
