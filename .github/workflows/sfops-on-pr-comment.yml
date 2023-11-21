@@ -136,7 +136,6 @@ jobs:
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
         id: report
-        if:  ${{ steps.lock.outputs.locked == 'true'}}
         with:
          status: 'locked'
          branch: ${{ steps.branch-deploy.outputs.ref }}
