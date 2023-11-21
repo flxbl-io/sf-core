@@ -73,6 +73,7 @@ jobs:
          
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: unlock
+        name: Test whether a lock exists
         continue-on-error: true
         with:
          mode: 'unlock-on-comment'
@@ -135,7 +136,7 @@ jobs:
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
         id: report
-        if:  ${{ steps.lock.outputs.locked == 'success'}}
+        if:  ${{ steps.lock.outputs.locked == 'true'}}
         with:
          status: 'locked'
          branch: ${{ steps.branch-deploy.outputs.ref }}
@@ -201,6 +202,17 @@ jobs:
 
             Please note this is not side effect free, your earlier deployments still persist on environment, You would need to do  a manual cleanup
             on the environment to remove the feature
+
+      - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
+        name: Report Branch Deployments
+        id: report
+        if:  ${{ steps.unlock.outputs.unlocked == 'true'}}
+        with:
+         status: 'unlocked'
+         branch: ${{ steps.branch-deploy.outputs.ref }}
+         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+         gh_token: ${{steps.app-token.outputs.token}}
+         issue-number: ${{ steps.branch-deploy.outputs.issue_number }}
           
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
