@@ -13,6 +13,7 @@ jobs:
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      base-ref: ${{ steps.comment-branch.outputs.base_ref}}
 
     steps:
 
@@ -97,7 +98,13 @@ jobs:
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
             by typing in sfops unlock.
   
-            
+
+      - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
+        id: fetchTestEnvs
+        with:
+          gh_token: ${{ steps.app-token.outputs.token }}
+          filter: "type:test,branch:${{ needs.analyze.outputs.base-ref }}"
+
 
       - name: Check for status
         id: branch-deploy
@@ -106,7 +113,8 @@ jobs:
         with:
           reaction: "eyes"
           stable_branch: "main"
-          release_name: ${{ matrix.releaseName }}
+          release-name: ${{ matrix.releaseName }}
+          test-envs: ${{steps.fetchTestEnvs.outputs.allEnvs}}
           github_token: ${{steps.app-token.outputs.token}}
           environment: test-${{ matrix.releaseName }}
           skip_ci: test-${{ matrix.releaseName }}
@@ -185,7 +193,6 @@ jobs:
             on the environment to remove the feature
   
           
-
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
