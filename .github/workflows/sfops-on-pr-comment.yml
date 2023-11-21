@@ -13,6 +13,7 @@ jobs:
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      base-ref: ${{ steps.comment-branch.outputs.base_ref}}
 
     steps:
 
@@ -59,6 +60,7 @@ jobs:
       issue-number: ${{ github.event.issue.number }}
       branch-ref: ${{ steps.branch-deploy.outputs.ref }}
       locked: ${{ steps.lock.outcome }}
+      base-ref: ${{ steps.branch-deploy.outputs.base_ref }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -96,7 +98,13 @@ jobs:
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
             by typing in sfops unlock.
   
-            
+
+      - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
+        id: fetchTestEnvs
+        with:
+          gh_token: ${{ steps.app-token.outputs.token }}
+          filter: "type:test,branch:${{ needs.analyze.outputs.base-ref }}"
+
 
       - name: Check for status
         id: branch-deploy
@@ -105,7 +113,8 @@ jobs:
         with:
           reaction: "eyes"
           stable_branch: "main"
-          release_name: ${{ matrix.releaseName }}
+          release-name: ${{ matrix.releaseName }}
+          test-envs: ${{steps.fetchTestEnvs.outputs.allEnvs}}
           github_token: ${{steps.app-token.outputs.token}}
           environment: test-${{ matrix.releaseName }}
           skip_ci: test-${{ matrix.releaseName }}
@@ -184,7 +193,6 @@ jobs:
             on the environment to remove the feature
   
           
-
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
@@ -201,6 +209,7 @@ jobs:
       domain: ${{ matrix.releaseName }}
       branchname: ${{ needs.deploy-lock.outputs.branch-ref }}
       branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
+      base-branch: ${{ needs.deploy-lock.outputs.base-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       releasename: ${{ vars.releaseName }}
