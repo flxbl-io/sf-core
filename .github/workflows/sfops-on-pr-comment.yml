@@ -95,8 +95,8 @@ jobs:
 
             There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
               
-            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
-            by typing in sfops unlock.
+            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}}  cancel any exising deployment runs and then proceed to unlock the issue
+            by typing in ```sfops unlock.```
   
 
       - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
@@ -132,7 +132,16 @@ jobs:
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
 
-  
+      - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
+        name: Report Branch Deployments
+        id: report
+        if:  ${{ steps.lock.outputs.locked == 'success'}}
+        with:
+         status: 'locked'
+         branch: ${{ steps.branch-deploy.outputs.ref }}
+         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+         gh_token: ${{steps.app-token.outputs.token}}
+         issue-number: ${{ steps.branch-deploy.outputs.issue_number }}
 
   deploy-unlock:
     if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops unlock') }}
@@ -173,8 +182,9 @@ jobs:
 
             There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
             
-            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} to unlock the issue
-            by typing in sfops unlock.
+            If you wish to __cancel__ the onoging deployment, 
+            Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} , cancel the ongoing run and then type in the following
+            to unlock the issue  ```sfops unlock ```.
 
       - uses: mshick/add-pr-comment@v2
         name: If the issue matches
@@ -191,7 +201,6 @@ jobs:
 
             Please note this is not side effect free, your earlier deployments still persist on environment, You would need to do  a manual cleanup
             on the environment to remove the feature
-  
           
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
