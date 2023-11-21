@@ -112,7 +112,7 @@ jobs:
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: unlock
         with:
-         mode: 'unlock-on-comment'
+         mode: 'unlock'
          environment: 'test-${{ matrix.releaseName }}'
          environment_targets: 'test-${{ matrix.releaseName }}'
          github_token: ${{steps.app-token.outputs.token}}
