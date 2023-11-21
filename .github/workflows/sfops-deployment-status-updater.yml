@@ -32,13 +32,6 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
-        id: delete-check
-        with:
-            ref: main
-            token: ${{steps.app-token.outputs.token}}
-            environment: 'qa'
-            onlyRemoveDeployments: "true"
 
       - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
         id: status-success
@@ -48,29 +41,7 @@ jobs:
             environment: 'qa'
             onlySucceedDeployments: "true"
 
-      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
-        id: status-failure
-        with:
-            ref: 'feat/feature-deployer'
-            token: ${{steps.app-token.outputs.token}}
-            environment: 'qa'
-            onlyfailDeployment: "true"
 
-      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
-        id: status-sucess-filter
-        with:
-            ref: 'feat/feature-deployer'
-            token: ${{steps.app-token.outputs.token}}
-            environment: 'qa'
-            onlySucceedDeployments: "true"
-            descriptionFilter: 'frameworks'
 
-      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
-        id: status-failure-filter
-        with:
-            ref: 'feat/feature-deployer'
-            token: ${{steps.app-token.outputs.token}}
-            environment: 'qa'
-            onlyfailDeployment: "true"
-            descriptionFilter: 'frameworks'
-            
+
+
