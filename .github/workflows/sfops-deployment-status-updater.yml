@@ -39,7 +39,17 @@ jobs:
             ref: 'feat/feature-deployer'
             token: ${{steps.app-token.outputs.token}}
             environment: 'qa'
-            setDeploymentAsSuccess: "true"
+            setDeploymentAsFailure: "true"
+
+      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
+        id: status-failure
+        with:
+            ref: 'feat/feature-deployer'
+            token: ${{steps.app-token.outputs.token}}
+            environment: 'qa'
+            setDeploymentAsFailure: "true"
+            descriptionFilter: "frameworks"
+
 
 
 
