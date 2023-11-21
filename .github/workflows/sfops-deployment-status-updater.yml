@@ -1,0 +1,57 @@
+# build all packages
+
+
+name: 'sfops - deploy status updater'
+
+
+on:
+
+  workflow_dispatch:
+
+
+
+#Set the environment variables for tracking metrics
+env:
+  SFPOWERSCRIPTS_DATADOG: 'true'
+  SFPOWERSCRIPTS_DATADOG_HOST: '${{ secrets.DATADOG_HOST }}'
+  SFPOWERSCRIPTS_DATADOG_API_KEY: '${{ secrets.DATADOG_API_KEY }}'
+
+
+jobs:
+
+  
+  deploy-unlock:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+
+      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
+        id: status-success
+        with:
+            ref: 'feat/feature-deployer'
+            token: ${{steps.app-token.outputs.token}}
+            environment: 'qa'
+            setDeploymentAsFailure: "true"
+
+      - uses: flxbl-io/sfops-gh-actions/deploymentStatusUpdater@main
+        id: status-failure
+        with:
+            ref: 'feat/feature-deployer'
+            token: ${{steps.app-token.outputs.token}}
+            environment: 'qa'
+            setDeploymentAsSuccess: "true"
+            descriptionFilter: "frameworks"
+
+
+
+
+
+
