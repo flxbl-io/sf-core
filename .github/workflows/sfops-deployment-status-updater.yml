@@ -39,7 +39,7 @@ jobs:
             ref: 'feat/feature-deployer'
             token: ${{steps.app-token.outputs.token}}
             environment: 'qa'
-            onlySucceedDeployments: "true"
+            setDeploymentAsSuccess: "true"
 
 
 
