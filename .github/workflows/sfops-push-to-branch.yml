@@ -94,7 +94,7 @@ jobs:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
       max-parallel: 1
-    uses:   perfectedclaims/sfops-gh-actions/.github/workflows/build-a-domain.yml@main
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/build-a-domain.yml@main
     with:
        releaseconfig: ${{ matrix.filePath }}
        domain: ${{ matrix.releaseName }}
