@@ -1,4 +1,4 @@
-@IsTest(IsParallel=true)
+@IsTest(IsParallel=false)
 private class FeatureCheckerImplementationTest {
     @IsTest
     private static void shouldReturnFalseWithNoImplementation() {
