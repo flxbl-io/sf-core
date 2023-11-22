@@ -89,4 +89,37 @@ jobs:
       SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+
+  report-merge-status:
+    name: "Report Merge status"
+    runs-on: ubuntu-latest
+    needs:
+      - build-publish
+    if: ${{ github.event.pull_request.merged == true  }}
+
+    steps:      
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+
+      - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
+        name: Report Branch Deployments
+        id: report
+        continue-on-error : true
+        with:
+         status: 'deployed'
+         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+         gh_token: ${{steps.app-token.outputs.token}}
+         issue-number: ${{ github.event.pull_request.number }}
   
