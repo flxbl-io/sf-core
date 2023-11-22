@@ -5,7 +5,6 @@ on:
     types: [created]
 
 jobs:
-
   analyze:
     name: "Analyze Impacted Domains"
     runs-on: ubuntu-latest
@@ -17,30 +16,27 @@ jobs:
       head-sha: ${{ steps.comment-branch.outputs.head_sha }}
 
     steps:
-
       - name: Add a reaction
         uses: GrantBirki/comment@e6bf4bc177996c9572b4ddb98b25eb1a80f9abc9 # pin@v2.0.7
         with:
           comment-id: ${{ github.event.comment.id}}
           reactions: eyes
-  
 
       - uses: xt0rted/pull-request-comment-branch@v2
         name: Figure out the commit refs
         id: comment-branch
-      
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.comment-branch.outputs.head_sha }}
-
 
       - name: "Figure Impacted Release Defns"
         uses: flxbl-io/sfops-gh-actions/impactedReleaseDefnDetector@main
         with:
           pathToReleaseDefns: "config"
           from-commit: ${{ steps.comment-branch.outputs.base_sha }}
-          to-commit:  ${{ steps.comment-branch.outputs.head_sha }}
+          to-commit: ${{ steps.comment-branch.outputs.head_sha }}
 
       - name: Set matrix data
         id: set-matrix
@@ -54,7 +50,7 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
-    needs: 
+    needs:
       - analyze
     outputs:
       continue: ${{ steps.branch-deploy.outputs.continue }}
@@ -71,29 +67,27 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.analyze.outputs.head-sha  }}
 
-         
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: unlock
         name: Test whether a lock exists
         continue-on-error: true
         with:
-         mode: 'unlock-on-comment'
-         environment: 'test-${{ matrix.releaseName }}'
-         environment_targets: 'test-${{ matrix.releaseName }}'
-         github_token: ${{steps.app-token.outputs.token}}
+          mode: "unlock-on-comment"
+          environment: "test-${{ matrix.releaseName }}"
+          environment_targets: "test-${{ matrix.releaseName }}"
+          github_token: ${{steps.app-token.outputs.token}}
 
       - uses: mshick/add-pr-comment@v2
         name: If a lock already exists
         if: ${{ steps.unlock.outputs.issue-match == 'false' }}
         with:
           allow-repeats: false
-          message-id:  issue-${{ github.event.issue.number }}
+          message-id: issue-${{ github.event.issue.number }}
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
@@ -105,14 +99,12 @@ jobs:
               
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}}  cancel any exising deployment runs and then proceed to unlock the issue
             by typing in ```sfops unlock.```
-  
 
       - uses: flxbl-io/sfops-gh-actions/fetchAllEnvs@main
         id: fetchTestEnvs
         with:
           gh_token: ${{ steps.app-token.outputs.token }}
           filter: "type:test,branch:${{ needs.analyze.outputs.base-ref }}"
-
 
       - name: Check for status
         id: branch-deploy
@@ -127,28 +119,27 @@ jobs:
           environment: test-${{ matrix.releaseName }}
           skip_ci: test-${{ matrix.releaseName }}
           skip_reviews: test-${{ matrix.releaseName }}
-          skip_completing: 'true'
-    
+          skip_completing: "true"
 
       - uses: flxbl-io/sfops-gh-actions/lock@main
         name: Claim Deployment Lock to Test Environments
         id: lock
-        if:  ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlocked == 'true'}}
+        if: ${{ steps.unlock.outcome == 'failure' || steps.unlock.outputs.unlocked == 'true'}}
         with:
-         mode: 'lock'
-         environment: 'test-${{ matrix.releaseName }}'
-         environment_targets: 'test-${{ matrix.releaseName }}'
-         github_token: ${{steps.app-token.outputs.token}}
+          mode: "lock"
+          environment: "test-${{ matrix.releaseName }}"
+          environment_targets: "test-${{ matrix.releaseName }}"
+          github_token: ${{steps.app-token.outputs.token}}
 
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
         id: report
         with:
-         status: 'locked'
-         branch: ${{ steps.branch-deploy.outputs.ref }}
-         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
-         gh_token: ${{steps.app-token.outputs.token}}
-         issue-number: ${{ steps.branch-deploy.outputs.issue_number }}
+          status: "locked"
+          branch: ${{ steps.branch-deploy.outputs.ref }}
+          dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+          gh_token: ${{steps.app-token.outputs.token}}
+          issue-number: ${{ steps.branch-deploy.outputs.issue_number }}
 
   deploy-unlock:
     if: ${{ github.event.issue.pull_request &&  startsWith(github.event.comment.body, 'sfops unlock') }}
@@ -159,7 +150,6 @@ jobs:
       matrix: ${{ fromJson(needs.analyze.outputs.matrix) }}
       fail-fast: false
     steps:
-
       - uses: actions/create-github-app-token@v1
         id: app-token
         name: "Get installation token for sfopsbot"
@@ -171,24 +161,24 @@ jobs:
       - uses: flxbl-io/sfops-gh-actions/lock@main
         id: unlock
         with:
-         mode: 'unlock-on-comment'
-         environment: 'test-${{ matrix.releaseName }}'
-         environment_targets: 'test-${{ matrix.releaseName }}'
-         github_token: ${{steps.app-token.outputs.token}}
+          mode: "unlock-on-comment"
+          environment: "test-${{ matrix.releaseName }}"
+          environment_targets: "test-${{ matrix.releaseName }}"
+          github_token: ${{steps.app-token.outputs.token}}
 
       - uses: mshick/add-pr-comment@v2
         name: If the issue doesnt match
         if: ${{ steps.unlock.outputs.issue-match == 'false' }}
         with:
           allow-repeats: false
-          message-id:  issue-${{ github.event.issue.number }}
+          message-id: issue-${{ github.event.issue.number }}
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
             Hello @${{ github.event.issue.user.login }} :wave:
 
             There is another deployment in progress, so the issue is locked by __${{steps.unlock.outputs.issue-number}}__
-            
+
             If you wish to __cancel__ the onoging deployment, 
             Please proceed to https://github.com/${{github.repository}}/pull/${{steps.unlock.outputs.issue-number}} , cancel the ongoing run and then type in the following
             to unlock the issue  ```sfops unlock ```.
@@ -198,7 +188,7 @@ jobs:
         if: ${{ steps.unlock.outputs.unlocked == 'true' }}
         with:
           allow-repeats: false
-          message-id:  issue-${{ github.event.issue.number }}
+          message-id: issue-${{ github.event.issue.number }}
           refresh-message-position: true
           repo-token: ${{ steps.app-token.outputs.token }}
           message: |
@@ -209,16 +199,21 @@ jobs:
             Please note this is not side effect free, your earlier deployments still persist on environment, You would need to do  a manual cleanup
             on the environment to remove the feature
 
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.analyze.outputs.head-sha  }}
+
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
         id: report
-        if:  ${{ steps.unlock.outputs.unlocked == 'true'}}
+        if: ${{ steps.unlock.outputs.unlocked == 'true'}}
         with:
-         status: 'unlocked'
-         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
-         gh_token: ${{steps.app-token.outputs.token}}
-         issue-number: ${{ github.event.issue.number }}
-          
+          status: "unlocked"
+          dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+          gh_token: ${{steps.app-token.outputs.token}}
+          issue-number: ${{ github.event.issue.number }}
+
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
     needs:
