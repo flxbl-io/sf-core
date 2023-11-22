@@ -70,6 +70,11 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
+      - uses: jwalton/gh-find-current-pr@v1
+        id: find-pr-number
+        name: find-pr-number
+        with:
+            state: closed
 
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
@@ -80,7 +85,7 @@ jobs:
          status: 'build'
          dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
          gh_token: ${{steps.app-token.outputs.token}}
-         issue-number: ${{ github.event.pull_request.number }}
+         issue-number: ${{ steps.find-pr-number.outputs.pr }}
   
 
   
@@ -137,6 +142,12 @@ jobs:
           private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
+      - uses: jwalton/gh-find-current-pr@v1
+        id: find-pr-number
+        name: find-pr-number
+        with:
+            state: closed
+
 
       - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
         name: Report Branch Deployments
@@ -146,5 +157,5 @@ jobs:
          status: 'test'
          dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
          gh_token: ${{steps.app-token.outputs.token}}
-         issue-number: ${{ github.event.pull_request.number }}
+         issue-number: ${{ steps.find-pr-number.outputs.pr }}
   
