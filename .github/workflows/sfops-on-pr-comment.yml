@@ -215,10 +215,9 @@ jobs:
         if:  ${{ steps.unlock.outputs.unlocked == 'true'}}
         with:
          status: 'unlocked'
-         branch: ${{ steps.branch-deploy.outputs.ref }}
          dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
          gh_token: ${{steps.app-token.outputs.token}}
-         issue-number: ${{ steps.branch-deploy.outputs.issue_number }}
+         issue-number: ${{ github.event.issue.number }}
           
   build-deploy:
     name: "Deploy ${{ matrix.releaseName }} to test environments"
