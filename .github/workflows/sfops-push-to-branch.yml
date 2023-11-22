@@ -154,7 +154,7 @@ jobs:
         id: report
         continue-on-error : true
         with:
-         status: 'test'
+         status: 'ready'
          dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
          gh_token: ${{steps.app-token.outputs.token}}
          issue-number: ${{ steps.find-pr-number.outputs.pr }}
