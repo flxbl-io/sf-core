@@ -6,13 +6,10 @@ on:
 
 jobs:
   build-deploy:
-    name: "Deploy ${{ matrix.releaseName }} to test environments"
+    name: "Deploy branch to test environments"
     uses: flxbl-io/sfops-gh-actions/.github/workflows/branch-deploy.yml@main
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     with:
-      branchname: ${{ needs.deploy-lock.outputs.branch-ref }}
-      branch-ref: ${{ needs.deploy-lock.outputs.branch-ref }}
-      base-branch: ${{ needs.deploy-lock.outputs.base-ref }}
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       releasename: ${{ vars.releaseName }}
