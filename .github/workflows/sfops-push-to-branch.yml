@@ -60,6 +60,29 @@ jobs:
         id: set-matrix
         run: |
            echo "matrix=$(jq -c . < ./impacted-release-configs.json)" >> $GITHUB_OUTPUT
+
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        name: "Get installation token for sfopsbot"
+        with:
+          app-id: ${{ vars.SFOPSBOT_APP_ID }}
+          private-key: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+
+      - uses: flxbl-io/sfops-gh-actions/branchDeploymentReporter@main
+        name: Report Branch Deployments
+        id: report
+        if: ${{ steps.set-matrix.outputs.matrix != '[]' && steps.set-matrix.outputs.matrix != '' && github.event_name == 'push' }}
+        continue-on-error : true
+        with:
+         status: 'build'
+         dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+         gh_token: ${{steps.app-token.outputs.token}}
+         issue-number: ${{ github.event.pull_request.number }}
+  
+
   
 
   build-publish:
@@ -120,7 +143,7 @@ jobs:
         id: report
         continue-on-error : true
         with:
-         status: 'deployed'
+         status: 'test'
          dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
          gh_token: ${{steps.app-token.outputs.token}}
          issue-number: ${{ github.event.pull_request.number }}
