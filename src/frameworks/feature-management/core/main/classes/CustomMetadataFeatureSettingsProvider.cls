@@ -1,6 +1,7 @@
 /**
  * @description Feature Settings Provider that returns Feature Settings
  * from the FeatureSetting__mdt Custom Metadata
+ * wohoo
  */
 public class CustomMetadataFeatureSettingsProvider implements FeatureSettingsProvider {
     /**
