@@ -1,4 +1,4 @@
-/**
+/***
  * @description Feature Checker Interface
  * Responsible for checking if a feature is enabled or not
  */
