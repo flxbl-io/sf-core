@@ -7,6 +7,7 @@ name: 'sfops - On Push to Branch'
 on:
   push:
     branches:
+      - main
       - 'release/**'
 
   workflow_dispatch:
@@ -21,9 +22,9 @@ env:
 
 
 jobs:
-   build-test-publish:
+  build-publish:
     name: 'Build & Publish'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/push-to-branch.yml@main
+    uses:   flxbl-io/sfops-gh-actions/.github/workflows/push-to-branch-branch-deploy.yml@main
     with:
        releaseconfig: 'config'
        branchname: ${{ github.ref_name }}
@@ -42,3 +43,5 @@ jobs:
       SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  
+
+
