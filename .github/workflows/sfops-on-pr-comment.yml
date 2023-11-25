@@ -7,7 +7,7 @@ on:
 jobs:
   build-deploy:
     name: "Deploy branch to test environments"
-    uses: flxbl-io/sfops-gh-actions/.github/workflows/branch-deploy.yml@main
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/exec-on-pr-comment.yml@main
     with:
       pathToReleaseConfigs: "config"
       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
