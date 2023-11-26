@@ -7,7 +7,7 @@ on:
 jobs:
   build-deploy:
     name: "Deploy branch to test environments"
-    uses: ${{ customer.repo_owner }}/sfops-gh-actions/.github/workflows/branch-deploy.yml@main
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/branch-deploy.yml@main
     if: ${{ github.event.issue.pull_request && ( startsWith(github.event.comment.body, 'sfops test') || (startsWith(github.event.comment.body, 'sfops unlock'))) }}
     with:
       pathToReleaseConfigs: "config"
@@ -28,7 +28,7 @@ jobs:
 
   renew-org:
     name: "Renew Sandbox and retrigger validation"
-    uses: ${{ customer.repo_owner }}/sfops-gh-actions/.github/workflows/exec-renew-review-org.yml@main
+    uses: flxbl-io/sfops-gh-actions/.github/workflows/exec-renew-review-org.yml@main
     if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, 'sfops renew')  }}
     with:
       issue-number: ${{ github.event.issue.number }}
