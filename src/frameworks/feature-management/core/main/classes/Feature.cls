@@ -1,5 +1,6 @@
-/**
+/***
  * @description Base Interface for all feature flags
+ * Updated by Azlam
  */
 public interface Feature {
     /**
