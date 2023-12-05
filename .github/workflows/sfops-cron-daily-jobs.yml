@@ -7,26 +7,14 @@ on:
 run-name: 'sfops- Execute Daily Jobs'
 
 jobs:
-  expire-dev-envs:
-    name: 'Expire Developer Environments'
-    uses:   flxbl-io/sfops-gh-actions/.github/workflows/expire-dev-envs.yml@main
-    with:
-      sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-    secrets:
-      DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
-      SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
-      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
-
-  gh-reporter:
-      name: 'Report Github Metrics'
-      uses:   flxbl-io/sfops-gh-actions/.github/workflows/gh-metrics-reporter.yml@main
+  exec-daily-reports:
+      name: 'Publish Reports'
+      uses:   ${{ customer.repo_owner }}/sfops-gh-actions/.github/workflows/exec-daily-jobs.yml@main
       with:
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
-         dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
       secrets:
         DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
         SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
+
