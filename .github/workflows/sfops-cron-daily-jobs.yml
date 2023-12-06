@@ -9,7 +9,7 @@ run-name: 'sfops- Execute Daily Jobs'
 jobs:
   exec-daily-reports:
       name: 'Publish Reports'
-      uses:   ${{ customer.repo_owner }}/sfops-gh-actions/.github/workflows/exec-daily-jobs.yml@main
+      uses:   flxbl-io/sfops-gh-actions/.github/workflows/exec-daily-jobs.yml@main
       with:
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
