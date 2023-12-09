@@ -1,6 +1,6 @@
 /**
  * @description Feature Settings Provider that returns Feature Settings
- * from the FeatureSetting__mdt Custom Metadata
+ * from the FeatureSetting__mdt Custom Metadata1
  */
 public class CustomMetadataFeatureSettingsProvider implements FeatureSettingsProvider {
     /**
