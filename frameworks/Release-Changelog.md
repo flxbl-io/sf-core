@@ -1,4 +1,22 @@
-[![prod-hotfix-Sprint-2-10-12-7155491388-2(0)-green](https://img.shields.io/static/v1?label=prod&message=hotfix-Sprint-2-10-12-7155491388-2(0)&color=green)](#a29bd19575b0978418dbed1999c9f0e1339a43ea) 
+[![prod-Sprint-2-10-12-7155075675-3(0)-green](https://img.shields.io/static/v1?label=prod&message=Sprint-2-10-12-7155075675-3(0)&color=green)](#18d937b50faffbba5ad0fa023ec5c18e768ad7c7) 
+<a id=18d937b50faffbba5ad0fa023ec5c18e768ad7c7></a>
+# Sprint-2-10-12-7155075675
+ Cumulative Release Number: <b>3</b> 
+
+Matching defintion first created or deployed to an org on: Sun Dec 10 2023 04:35:17 GMT+0000 (Coordinated Universal Time)
+ ### Artifacts :package:
+- **feature-management**     v1.2.0.1 (3940829a)
+
+### Work Items :gem:
+N/A
+
+### Commits :book:
+N/A
+
+### Additional Information
+The following artifacts' version may have changed due to an update in the scratch org definition file, incremented package version in SFDX project configuration, or build all packages:
+  - feature-management
+
 <a id=a29bd19575b0978418dbed1999c9f0e1339a43ea></a>
 # hotfix-Sprint-2-10-12-7155491388
  Cumulative Release Number: <b>2</b> 
