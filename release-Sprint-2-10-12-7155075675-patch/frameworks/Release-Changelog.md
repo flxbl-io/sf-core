@@ -1,4 +1,24 @@
 [![prod-Sprint-2-10-12-7155075675-3(0)-green](https://img.shields.io/static/v1?label=prod&message=Sprint-2-10-12-7155075675-3(0)&color=green)](#18d937b50faffbba5ad0fa023ec5c18e768ad7c7) 
+<a id=e300a940b2de2840c8ac872d97d622cca3f18895></a>
+# hotfix-Sprint-2-10-12-7155672878
+ Cumulative Release Number: <b>4</b> 
+
+Matching defintion first created or deployed to an org on: Sun Dec 10 2023 04:51:36 GMT+0000 (Coordinated Universal Time)
+ ### Artifacts :package:
+- **feature-management**     v1.2.2.1 (39bfb589)
+
+### Work Items :gem:
+[](undefined)
+
+### Commits :book:
+
+#### feature-management
+| Date       | Time     | Commit ID | Commit Message                               |
+| ---------- | -------- | --------- | -------------------------------------------- |
+| 10/12/2023 | 04:46:10 | 39bfb589  | fix(frameworks): test hotfix flow [FGK-1234] |
+| 10/12/2023 | 04:42:46 | b036a149  | Reset feature-management to 1.2.0.1          |
+| 10/12/2023 | 04:36:24 | 98b851bb  | Add v3 to test hotfix                        |
+
 <a id=18d937b50faffbba5ad0fa023ec5c18e768ad7c7></a>
 # Sprint-2-10-12-7155075675
  Cumulative Release Number: <b>3</b> 
