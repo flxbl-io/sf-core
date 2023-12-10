@@ -1,3 +1,5 @@
+//Add a comment
+
 @IsTest(IsParallel=true)
 private class CustMetadataFeatureSettingsProviderTest {
     @IsTest
