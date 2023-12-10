@@ -1,0 +1,187 @@
+{
+    "orgs": [],
+    "releases": [
+        {
+            "names": [
+                "Sprint-2-22-11-6951737115"
+            ],
+            "buildNumber": 1,
+            "workItems": {
+                "": [
+                    "50a3e4d6",
+                    "b6d8a989",
+                    "404718af",
+                    "138e23c5",
+                    "22db52e0",
+                    "55ef8227"
+                ]
+            },
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "to": "50a3e4d6",
+                    "version": "1.0.26.6951737115",
+                    "latestCommitId": "50a3e4d6",
+                    "commits": [
+                        {
+                            "commitId": "50a3e4d6",
+                            "date": "2023-11-22T12:39:07+11:00",
+                            "author": "Azlam",
+                            "message": "fix: change parallel to false (#72)",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "b6d8a989",
+                            "date": "2023-10-26T13:52:29+11:00",
+                            "author": "Azlam",
+                            "message": "fix: disable disable feature",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "404718af",
+                            "date": "2023-10-26T13:50:28+11:00",
+                            "author": "Azlam",
+                            "message": "fix: change return to true",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "138e23c5",
+                            "date": "2023-10-26T13:49:57+11:00",
+                            "author": "Azlam",
+                            "message": "fix: change return to false",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "22db52e0",
+                            "date": "2023-10-26T13:47:47+11:00",
+                            "author": "Azlam",
+                            "message": "fix: test-pr",
+                            "body": ""
+                        },
+                        {
+                            "commitId": "55ef8227",
+                            "date": "2023-08-27T11:57:41+10:00",
+                            "author": "azlam-abdulsalam",
+                            "message": "feat: add new package feature-management",
+                            "body": ""
+                        }
+                    ]
+                }
+            ],
+            "hashId": "978d1b64efa7bee6602d1a4365d75a31a7600f10",
+            "date": "Wed Nov 22 2023 01:44:41 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-2-22-11-6963296317"
+            ],
+            "buildNumber": 2,
+            "workItems": {
+                "": [
+                    "d8358629"
+                ]
+            },
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "from": "50a3e4d6",
+                    "to": "d8358629",
+                    "version": "1.0.26.6963296317",
+                    "latestCommitId": "d8358629",
+                    "commits": [
+                        {
+                            "commitId": "d8358629",
+                            "date": "2023-11-23T09:22:38+11:00",
+                            "author": "Azlam",
+                            "message": "fix: fix update comments (#76)",
+                            "body": ""
+                        }
+                    ]
+                }
+            ],
+            "hashId": "f7955aede8b255845e9153c248becdbf956791c9",
+            "date": "Wed Nov 22 2023 22:28:30 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-2-10-12-7154632894"
+            ],
+            "buildNumber": 3,
+            "workItems": {},
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "from": "d8358629",
+                    "to": "eaf86cf6",
+                    "version": "1.0.27.2",
+                    "latestCommitId": "d8358629",
+                    "commits": []
+                }
+            ],
+            "hashId": "401b15183e6bf7bc765b10f5bfc169fb0c5be20c",
+            "date": "Sun Dec 10 2023 01:07:22 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-2-10-12-7155075675"
+            ],
+            "buildNumber": 4,
+            "workItems": {
+                "": [
+                    "3940829a"
+                ]
+            },
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "from": "eaf86cf6",
+                    "to": "3940829a",
+                    "version": "1.2.0.1",
+                    "latestCommitId": "3940829a",
+                    "commits": [
+                        {
+                            "commitId": "3940829a",
+                            "date": "2023-12-10T13:25:21+11:00",
+                            "author": "sfopsbot",
+                            "message": "fix: test hotfix workflow",
+                            "body": ""
+                        }
+                    ]
+                }
+            ],
+            "hashId": "18d937b50faffbba5ad0fa023ec5c18e768ad7c7",
+            "date": "Sun Dec 10 2023 02:30:51 GMT+0000 (Coordinated Universal Time)"
+        },
+        {
+            "names": [
+                "Sprint-2-10-12-7155641642"
+            ],
+            "buildNumber": 5,
+            "workItems": {
+                "": [
+                    "98b851bb"
+                ]
+            },
+            "artifacts": [
+                {
+                    "name": "feature-management",
+                    "from": "3940829a",
+                    "to": "98b851bb",
+                    "version": "1.3.0.1",
+                    "latestCommitId": "98b851bb",
+                    "commits": [
+                        {
+                            "commitId": "98b851bb",
+                            "date": "2023-12-10T15:36:24+11:00",
+                            "author": "sfopsbot",
+                            "message": "Add v3 to test hotfix",
+                            "body": ""
+                        }
+                    ]
+                }
+            ],
+            "hashId": "7b33c157dc48b355c727cd9659eba42b9fdd2b44",
+            "date": "Sun Dec 10 2023 04:41:49 GMT+0000 (Coordinated Universal Time)"
+        }
+    ]
+}
