@@ -17,7 +17,7 @@ jobs:
       source-repo-url: https://github.com/${{github.repository}}
       workitem-url:  ${{ vars.SFOPS_ISSUETRACKER_URL }}
       metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
-      dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+      dashboard-repo: ${{ vars.SFOPS_DASHBOARD_REPO }}
       issue-notifier: 'flxbl-io/sf-core'
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
