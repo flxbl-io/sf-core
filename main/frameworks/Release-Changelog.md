@@ -1,4 +1,22 @@
 
+<a id=c7473e507aba60a55091f1559be2fa0caf126833></a>
+# Sprint-2-11-12-7163399200
+ Cumulative Release Number: <b>12</b> 
+
+Matching defintion first created or deployed to an org on: Mon Dec 11 2023 05:43:10 GMT+0000 (Coordinated Universal Time)
+ ### Artifacts :package:
+- **feature-management**     v1.3.7.1 (f60ca9e6)
+
+### Work Items :gem:
+[](undefined)
+
+### Commits :book:
+
+#### feature-management
+| Date       | Time     | Commit ID | Commit Message                                         |
+| ---------- | -------- | --------- | ------------------------------------------------------ |
+| 11/12/2023 | 05:37:52 | f60ca9e6  | [FGK-302] fix(feature): bug in custom data provisioner |
+
 <a id=8c5e06878d191f1429ce15c8378c200b2524412d></a>
 # Sprint-2-11-12-7163395065
  Cumulative Release Number: <b>11</b> 
