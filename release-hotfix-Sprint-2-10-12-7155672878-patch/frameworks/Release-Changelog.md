@@ -1,4 +1,22 @@
 [![prod-hotfix-Sprint-2-10-12-7155672878-4(0)-green](https://img.shields.io/static/v1?label=prod&message=hotfix-Sprint-2-10-12-7155672878-4(0)&color=green)](#e300a940b2de2840c8ac872d97d622cca3f18895) 
+<a id=825d94c7cd5ffc4979aef703e66987c742095012></a>
+# hotfix-Sprint-2-11-12-7162190151
+ Cumulative Release Number: <b>5</b> 
+
+Matching defintion first created or deployed to an org on: Mon Dec 11 2023 02:39:26 GMT+0000 (Coordinated Universal Time)
+ ### Artifacts :package:
+- **feature-management**     v1.2.2.3 (455846c1)
+
+### Work Items :gem:
+N/A
+
+### Commits :book:
+N/A
+
+### Additional Information
+The following artifacts' version may have changed due to an update in the scratch org definition file, incremented package version in SFDX project configuration, or build all packages:
+  - feature-management
+
 <a id=e300a940b2de2840c8ac872d97d622cca3f18895></a>
 # hotfix-Sprint-2-10-12-7155672878
  Cumulative Release Number: <b>4</b> 
@@ -8,7 +26,7 @@ Matching defintion first created or deployed to an org on: Sun Dec 10 2023 05:08
 - **feature-management**     v1.2.2.1 (39bfb589)
 
 ### Work Items :gem:
-[FGK-1234](https://adiza.atlassian.net/browse/FGK-1234)
+[FGK-1234](undefined)
 
 ### Commits :book:
 
