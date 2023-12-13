@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - 'release/**'
+      - release-**
 
   workflow_dispatch:
 
@@ -29,7 +30,7 @@ jobs:
        releaseconfig: 'config'
        branchname: ${{ github.ref_name }}
        pathToReleaseConfigs: 'config'
-       dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+       dashboard-repo: ${{ vars.SFOPS_DASHBOARD_REPO }}
        releasename: ${{ vars.RELEASENAME }}
        metrics-provider:  ${{ vars.SFOPS_METRICS_PROVIDER }}
        workitem-url: ${{ vars.SFOPS_ISSUETRACKER_URL }}

@@ -1,5 +1,5 @@
 /***
- * @description Feature Implementation that is always enabled
+ * @description Feature Implementation that is always enabled v3
  */
 public class AlwaysDisabledFeature implements Feature {
     /**

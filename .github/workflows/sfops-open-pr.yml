@@ -5,9 +5,15 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
+      - release-*
       - release/*
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }} 
+  cancel-in-progress: true
+
+  
 jobs:
  validate-changes:
     name: 'Validate changes raised in a PR'

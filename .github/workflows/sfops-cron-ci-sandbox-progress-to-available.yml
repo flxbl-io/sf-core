@@ -15,7 +15,7 @@ jobs:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
       path-to-config : "config/sandbox-pool-config.json"
       metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
-      dashboard-repo: ${{ vars.SFOPS_DASBHOARD_REPO }}
+      dashboard-repo: ${{ vars.SFOPS_DASHBOARD_REPO }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}

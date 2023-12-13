@@ -16,7 +16,7 @@ jobs:
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/apex-test-on-test-envs.yml@main
     with:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-      dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+      dashboard-repo:  ${{ vars.SFOPS_DASHBOARD_REPO }}
       metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
@@ -30,7 +30,7 @@ jobs:
     uses:   flxbl-io/sfops-gh-actions/.github/workflows/static-analysis.yml@main
     with:
       sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
-      dashboard-repo:  ${{ vars.SFOPS_DASBHOARD_REPO }}
+      dashboard-repo:  ${{ vars.SFOPS_DASHBOARD_REPO }}
     secrets:
       DEVHUB_SFDX_AUTH_URL: ${{ secrets.DEVHUB_SFDX_AUTH_URL }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
