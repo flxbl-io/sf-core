@@ -29,6 +29,7 @@ jobs:
       DATADOG_HOST: ${{ secrets.DATADOG_HOST }}
       SFOPSBOT_APP_PRIVATE_KEY: ${{ secrets.SFOPSBOT_APP_PRIVATE_KEY }}
       NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+      PACKAGE_INSTALLATION_KEYS: ${{ secrets.PACKAGE_INSTALLATION_KEYS }}
 
 
 

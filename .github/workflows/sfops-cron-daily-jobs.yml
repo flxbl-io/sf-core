@@ -13,6 +13,7 @@ jobs:
       with:
          sfopsbot-app-id: ${{ vars.SFOPSBOT_APP_ID }}
          metrics-provider: ${{ vars.SFOPS_METRICS_PROVIDER }}
+         dashboard-repo: ${{ vars.SFOPS_DASHBOARD_REPO }}
       secrets:
         DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DATADOG_HOST: ${{ secrets.DATADOG_HOST }}

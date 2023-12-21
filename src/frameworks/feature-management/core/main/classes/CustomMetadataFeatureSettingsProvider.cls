@@ -2,6 +2,7 @@
  * Hotfix comments
  * @description Feature Settings Provider that returns Feature Settings
  * from the FeatureSetting__mdt Custom Metadata
+ * v10
  */
 public class CustomMetadataFeatureSettingsProvider implements FeatureSettingsProvider {
     /**
