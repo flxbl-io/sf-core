@@ -201,25 +201,6 @@
             ],
             "hashId": "e300a940b2de2840c8ac872d97d622cca3f18895",
             "date": "Sun Dec 10 2023 05:08:23 GMT+0000 (Coordinated Universal Time)"
-        },
-        {
-            "names": [
-                "hotfix-Sprint-2-11-12-7162190151"
-            ],
-            "buildNumber": 5,
-            "workItems": {},
-            "artifacts": [
-                {
-                    "name": "feature-management",
-                    "from": "39bfb589",
-                    "to": "455846c1",
-                    "version": "1.2.2.3",
-                    "latestCommitId": "455846c1",
-                    "commits": []
-                }
-            ],
-            "hashId": "825d94c7cd5ffc4979aef703e66987c742095012",
-            "date": "Mon Dec 11 2023 02:39:26 GMT+0000 (Coordinated Universal Time)"
         }
     ]
 }
