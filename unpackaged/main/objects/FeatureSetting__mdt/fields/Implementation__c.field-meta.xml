@@ -4,7 +4,7 @@
     <description>Class Name for the feature implementation</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
-    <inlineHelpText>Class Name for the feature implementation</inlineHelpText>
+    <inlineHelpText>Class Name for the feature implementation2</inlineHelpText>
     <label>Implementation</label>
     <length>50</length>
     <required>true</required>
